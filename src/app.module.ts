@@ -28,7 +28,7 @@ import { Form } from './forms/entities/form.entity';
     }),
     // index.html serving
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../frontend', 'public'),
+      rootPath: join(__dirname, '../frontend', 'dist'),
     }),
     // request throttler
     ThrottlerModule.forRoot({
