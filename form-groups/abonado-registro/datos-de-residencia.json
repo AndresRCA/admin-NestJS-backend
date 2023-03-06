@@ -1,0 +1,63 @@
+[
+  {
+    "tag": "input",
+    "label": "residencia",
+    "col_width": 6,
+    "attributes": {
+      "name": "residencia",
+      "type": "radio",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 1
+  },
+  {
+    "tag": "input",
+    "label": "nro. casa",
+    "col_width": 6,
+    "attributes": {
+      "name": "nro_casa",
+      "type": "text",
+      "pattern": "[0-9]*"
+    },
+    "validators": ["required", "pattern"],
+    "data": [],
+    "order": 2
+  },
+  {
+    "tag": "textarea",
+    "label": "punto de referencia",
+    "col_width": 12,
+    "attributes": {
+      "name": "punto_referencia",
+      "maxLength": 255
+    },
+    "validators": ["maxLength"],
+    "order": 3
+  },
+  {
+    "tag": "textarea",
+    "label": "dirección fiscal",
+    "col_width": 12,
+    "attributes": {
+      "name": "direccion_fiscal",
+      "placeholder": "dirección fiscal",
+      "maxLength": 255,
+      "disabled": true
+    },
+    "order": 4
+  },
+  {
+    "tag": "button",
+    "label": "georeferenciación",
+    "icon": "fa-globe",
+    "col_width": 12,
+    "attributes": {
+      "value": "mapa"
+    },
+    "action": "openMap",
+    "fills": "direccion_fiscal",
+    "order": 5
+  }
+]

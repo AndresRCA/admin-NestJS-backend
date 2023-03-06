@@ -1,0 +1,128 @@
+[
+  {
+    "tag": "input",
+    "label": "fecha de nacimiento",
+    "col_width": 3,
+    "attributes": {
+      "name": "fecha_nacimiento",
+      "type": "date",
+      "required": true
+    },
+    "validators": ["required"],
+    "order": 1
+  },
+  {
+    "tag": "select",
+    "label": "tipo cliente",
+    "col_width": 3,
+    "attributes": {
+      "name": "tipo_cliente",
+      "placeholder": "seleccione...",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 2
+  },
+  {
+    "tag": "select",
+    "label": "tipo doc.",
+    "col_width": 3,
+    "attributes": {
+      "name": "tipo_doc",
+      "placeholder": "seleccione...",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 3
+  },
+  {
+    "tag": "input",
+    "label": "n° documento",
+    "col_width": 3,
+    "attributes": {
+      "name": "n_documento",
+      "placeholder": "seleccione...",
+      "type": "text",
+      "pattern": "[0-9]*",
+      "required": true
+    },
+    "validators": ["required", "pattern"],
+    "order": 4
+  },
+  {
+    "tag": "input",
+    "label": "nombre(s)",
+    "col_width": 6,
+    "attributes": {
+      "name": "nombre",
+      "type": "text",
+      "required": true
+    },
+    "validators": ["required"],
+    "order": 5
+  },
+  {
+    "tag": "input",
+    "label": "apellido(s)",
+    "col_width": 6,
+    "attributes": {
+      "name": "apellido",
+      "type": "text",
+      "required": true
+    },
+    "validators": ["required"],
+    "order": 6
+  },
+  {
+    "tag": "input",
+    "label": "celular (móvil)",
+    "col_width": 6,
+    "attributes": {
+      "name": "celular",
+      "type": "tel",
+      "pattern": "[0-9]{3}-[0-9]{7}",
+      "required": true
+    },
+    "validators": ["required", "pattern"],
+    "order": 7
+  },
+  {
+    "tag": "input",
+    "label": "télefono fijo",
+    "col_width": 6,
+    "attributes": {
+      "name": "telefono_fijo",
+      "type": "tel",
+      "pattern": "[0-9]{3}-[0-9]{7}",
+      "required": true
+    },
+    "validators": ["required", "pattern"],
+    "order": 8
+  },
+  {
+    "tag": "input",
+    "label": "tlf. adicional",
+    "col_width": 6,
+    "attributes": {
+      "name": "telefono_adicional",
+      "type": "tel",
+      "pattern": "[0-9]{3}-[0-9]{7}"
+    },
+    "validators": ["pattern"],
+    "order": 9
+  },
+  {
+    "tag": "input",
+    "label": "e-mail",
+    "col_width": 6,
+    "attributes": {
+      "name": "email",
+      "type": "email",
+      "required": true
+    },
+    "validators": ["required", "email"],
+    "order": 10
+  }
+]

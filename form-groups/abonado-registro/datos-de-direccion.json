@@ -1,0 +1,77 @@
+[
+  {
+    "tag": "select",
+    "label": "departamento",
+    "col_width": 6,
+    "attributes": {
+      "name": "departamento",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 1
+  },
+  {
+    "tag": "select",
+    "label": "ciudad/municipio",
+    "col_width": 6,
+    "attributes": {
+      "name": "ciudad_municipio",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 2
+  },
+  {
+    "tag": "select",
+    "label": "zona",
+    "col_width": 6,
+    "attributes": {
+      "name": "zona",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 3
+  },
+  {
+    "tag": "select",
+    "label": "sector",
+    "col_width": 6,
+    "attributes": {
+      "name": "sector",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 4
+  },
+  {
+    "form_array": [
+      {
+        "tag": "select",
+        "label": "nomenclatura",
+        "col_width": 6,
+        "attributes": {
+          "name": "nomeclatura",
+          "required": true
+        },
+        "validators": ["required"],
+        "data": []
+      },
+      {
+        "tag": "select",
+        "label": "valor",
+        "col_width": 6,
+        "attributes": {
+          "name": "valor",
+          "required": true
+        },
+        "validators": ["required"],
+        "data": []
+      }
+    ],
+    "order": 5
+  }
+]

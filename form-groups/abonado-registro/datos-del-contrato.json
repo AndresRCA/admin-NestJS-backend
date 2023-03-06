@@ -1,0 +1,102 @@
+[
+  {
+    "tag": "input",
+    "label": "tipo de abonado",
+    "col_width": 8,
+    "attributes": {
+      "name": "tipo_abonado",
+      "type": "radio",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 1
+  },
+  {
+    "tag": "input",
+    "label": "tipo de facturación",
+    "col_width": 4,
+    "attributes": {
+      "name": "tipo_facturacion",
+      "type": "radio",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 2
+  },
+  {
+    "tag": "select",
+    "label": "franquicia",
+    "col_width": 4,
+    "attributes": {
+      "name": "franquicia",
+      "placeholder": "seleccione...",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 3
+  },
+  {
+    "tag": "select",
+    "label": "grupo afinidad",
+    "col_width": 4,
+    "attributes": {
+      "name": "grupo_afinidad",
+      "placeholder": "seleccione...",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 4
+  },
+  {
+    "tag": "select",
+    "label": "vendedor",
+    "col_width": 4,
+    "attributes": {
+      "name": "vendedor",
+      "placeholder": "seleccione...",
+      "required": true
+    },
+    "validators": ["required"],
+    "data": [],
+    "order": 5
+  },
+  {
+    "tag": "input",
+    "label": "asesor",
+    "col_width": 4,
+    "attributes": {
+      "name": "asesor",
+      "type": "text",
+      "required": true
+    },
+    "validators": ["required"],
+    "order": 6
+  },
+  {
+    "tag": "input",
+    "label": "poste",
+    "col_width": 4,
+    "attributes": {
+      "name": "poste",
+      "type": "text",
+      "required": true
+    },
+    "validators": ["required"],
+    "order": 7
+  },
+  {
+    "tag": "textarea",
+    "label": "observación",
+    "col_width": 12,
+    "attributes": {
+      "name": "contrato_observacion",
+      "maxLength": 255
+    },
+    "validators": ["maxLength"],
+    "order": 8
+  }
+]
