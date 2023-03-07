@@ -66,17 +66,20 @@ export class FormsController {
         case 'datos del abonado':
           formGroupData = this.formsService.getClientDataFormData();
           break;
+        
+        case 'datos de dirección':
+          formGroupData = this.formsService.getDirectionsDataFormData();
+          break;
       }
-
       if(!formGroupData) continue;
 
       for (let control of formGroup.controls) {
         if (control.data !== undefined) {
-          control.data = formGroupData[control.attributes.name as keyof IContractDataFormData];
+          control.data = formGroupData[control.attributes.name];
         }
       }
     }
-
+    registerClientForm.formGroups.pop();
     return registerClientForm;
   }
 }

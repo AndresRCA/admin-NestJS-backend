@@ -46,4 +46,10 @@ export class FormsService {
       tipo_doc: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}]
     }
   }
+
+  getDirectionsDataFormData(): any {
+    return {
+      
+    }
+  }
 }
