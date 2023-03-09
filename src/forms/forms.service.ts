@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FormQueryDto } from './dto/form-query.dto';
 import { Form } from './entities/form.entity';
-import { IContractDataFormData } from './interfaces/IContractDataFormData.interface';
 
 @Injectable()
 export class FormsService {
@@ -30,7 +29,7 @@ export class FormsService {
   /**
    * Connect to the DB and collects the data for the contract data form
    */
-  getContractDataFormData(): IContractDataFormData {
+  getContractDataFormData() {
     return {
       tipo_abonado: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}], // control_name: Array<data>
       tipo_facturacion: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],

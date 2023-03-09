@@ -1,10 +1,13 @@
+import { IStyleRules } from "./IStyleRules.interface";
+
 export interface IFormControl<T = any> {
-  tag: 'input' | 'select' | 'textarea' | 'button';
-  label: string;
-  icon?: string, // usually a font awesome icon class (e.g. fa-globe, fa-refresh)
-  col_width: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12; // refers to the space the controls occupies in a row
-  attributes: {
-    name: string;
+  name: string;
+  tag?: 'input' | 'select' | 'textarea' | 'button';
+  label?: string;
+  style_rules?: IStyleRules;
+  form_array_controls?: Array<IFormControl>; // this array of controls refers to what gets asked again in a form (could be only one control, or more)
+  is_form_array?: true;
+  attributes?: {
     type?: 'text' | 'radio' | 'checkbox' | 'number' | 'tel' | 'date' | 'email' | 'url' | 'search' | 'password';
     placeholder?: string;
     pattern?: string; // regex
@@ -22,5 +25,4 @@ export interface IFormControl<T = any> {
   order: number; // order for the control (1 would mean it's the first element in the form)
   action?: string; // method to execute (in the case of a button)
   fills?: string // must be the name of a form control (this is for external controls that execute actions and fill another control)
-  form_array?: IFormControl[]
 }

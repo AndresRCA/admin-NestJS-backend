@@ -2,7 +2,6 @@ import { Controller, Get, InternalServerErrorException, Param, Query, UseGuards 
 import { ApiInternalServerErrorResponse, ApiOkResponse, ApiSecurity } from '@nestjs/swagger';
 import { FormsService } from './forms.service';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
-import { IContractDataFormData } from './interfaces/IContractDataFormData.interface';
 import { Form } from './entities/form.entity';
 import { FormQueryDto } from './dto/form-query.dto';
 
@@ -75,7 +74,7 @@ export class FormsController {
 
       for (let control of formGroup.controls) {
         if (control.data !== undefined) {
-          control.data = formGroupData[control.attributes.name];
+          control.data = formGroupData[control.name];
         }
       }
     }
