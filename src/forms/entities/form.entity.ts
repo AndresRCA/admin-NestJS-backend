@@ -16,8 +16,12 @@ export class Form {
   })
   name: string;
 
-  @Column({ nullable: true, type: 'json', comment: 'JSON object with rules that define the styling characteristics of this form' })
-  style_rules: IStyleRules;
+  @Column({
+    nullable: true,
+    type: 'json',
+    comment: 'JSON object with rules that define the styling characteristics of this form'
+  })
+  style_rules?: IStyleRules;
 
   @ApiProperty({ type: () => [FormGroup] })
   @OneToMany(() => FormGroup, (formGroup) => formGroup.form)

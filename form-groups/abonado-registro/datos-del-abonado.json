@@ -1,10 +1,12 @@
 [
   {
+    "name": "fecha_nacimiento",
     "tag": "input",
     "label": "fecha de nacimiento",
-    "col_width": 3,
+    "style_rules": {
+      "width": 3
+    },
     "attributes": {
-      "name": "fecha_nacimiento",
       "type": "date",
       "required": true
     },
@@ -12,11 +14,13 @@
     "order": 1
   },
   {
+    "name": "tipo_cliente",
     "tag": "select",
     "label": "tipo cliente",
-    "col_width": 3,
+    "style_rules": {
+      "width": 3
+    },
     "attributes": {
-      "name": "tipo_cliente",
       "placeholder": "seleccione...",
       "required": true
     },
@@ -25,11 +29,13 @@
     "order": 2
   },
   {
+    "name": "tipo_doc",
     "tag": "select",
     "label": "tipo doc.",
-    "col_width": 3,
+    "style_rules": {
+      "width": 3
+    },
     "attributes": {
-      "name": "tipo_doc",
       "placeholder": "seleccione...",
       "required": true
     },
@@ -38,11 +44,13 @@
     "order": 3
   },
   {
+    "name": "n_documento",
     "tag": "input",
     "label": "n° documento",
-    "col_width": 3,
+    "style_rules": {
+      "width": 3
+    },
     "attributes": {
-      "name": "n_documento",
       "placeholder": "seleccione...",
       "type": "text",
       "pattern": "[0-9]*",
@@ -52,11 +60,13 @@
     "order": 4
   },
   {
+    "name": "nombre",
     "tag": "input",
     "label": "nombre(s)",
-    "col_width": 6,
+    "style_rules": {
+      "width": 6
+    },
     "attributes": {
-      "name": "nombre",
       "type": "text",
       "required": true
     },
@@ -64,11 +74,13 @@
     "order": 5
   },
   {
+    "name": "apellido",
     "tag": "input",
     "label": "apellido(s)",
-    "col_width": 6,
+    "style_rules": {
+      "width": 6
+    },
     "attributes": {
-      "name": "apellido",
       "type": "text",
       "required": true
     },
@@ -76,11 +88,13 @@
     "order": 6
   },
   {
+    "name": "celular",
     "tag": "input",
     "label": "celular (móvil)",
-    "col_width": 6,
+    "style_rules": {
+      "width": 6
+    },
     "attributes": {
-      "name": "celular",
       "type": "tel",
       "pattern": "[0-9]{3}-[0-9]{7}",
       "required": true
@@ -89,11 +103,13 @@
     "order": 7
   },
   {
+    "name": "telefono_fijo",
     "tag": "input",
     "label": "télefono fijo",
-    "col_width": 6,
+    "style_rules": {
+      "width": 6
+    },
     "attributes": {
-      "name": "telefono_fijo",
       "type": "tel",
       "pattern": "[0-9]{3}-[0-9]{7}",
       "required": true
@@ -102,11 +118,13 @@
     "order": 8
   },
   {
+    "name": "telefono_adicional",
     "tag": "input",
     "label": "tlf. adicional",
-    "col_width": 6,
+    "style_rules": {
+      "width": 6
+    },
     "attributes": {
-      "name": "telefono_adicional",
       "type": "tel",
       "pattern": "[0-9]{3}-[0-9]{7}"
     },
@@ -114,11 +132,13 @@
     "order": 9
   },
   {
+    "name": "email",
     "tag": "input",
     "label": "e-mail",
-    "col_width": 6,
+    "style_rules": {
+      "width": 6
+    },
     "attributes": {
-      "name": "email",
       "type": "email",
       "required": true
     },
