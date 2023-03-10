@@ -13,6 +13,7 @@ import { FormsModule } from './forms/forms.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FormGroup } from './forms/entities/form-group.entity';
 import { Form } from './forms/entities/form.entity';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -50,6 +51,8 @@ import { Form } from './forms/entities/form.entity';
           FormGroup
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
+        migrations: ['../migrations/*{.ts,.js}'],
+        namingStrategy: new SnakeNamingStrategy()
       }),
       inject: [ConfigService],
     }),

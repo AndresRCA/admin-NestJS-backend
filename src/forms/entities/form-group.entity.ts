@@ -10,10 +10,17 @@ export class FormGroup {
   @Column()
   name: string;
 
-  @Column({ type: 'int'})
+  @Column({
+    nullable: false,
+    type: 'int'
+  })
   order: number;
 
-  @Column({ nullable: false, type: 'json', comment: 'Json array of controls for form group' })
+  @Column({
+    nullable: false,
+    type: 'json',
+    comment: 'Json array of controls for form group'
+  })
   controls: IFormControl[];
 
   @ManyToOne(() => Form, (form) => form.formGroups, {

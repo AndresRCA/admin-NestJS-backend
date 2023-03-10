@@ -41,5 +41,8 @@ lerna-debug.log*
 .env.development
 .env.production
 
+# migrations
+/migrations/*
+
 # misc
 rest.http
