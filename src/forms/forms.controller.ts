@@ -78,7 +78,7 @@ export class FormsController {
         }
       }
     }
-    registerClientForm.formGroups.pop();
+    
     return registerClientForm;
   }
 }

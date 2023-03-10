@@ -48,7 +48,7 @@ export class FormsService {
 
   getDirectionsDataFormData(): any {
     return {
-      
+      residencia: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}]
     }
   }
 }

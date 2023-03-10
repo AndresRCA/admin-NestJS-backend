@@ -4,6 +4,7 @@ export interface IFormControl<T = any> {
   name: string;
   tag?: 'input' | 'select' | 'textarea' | 'button';
   label?: string;
+  content?: string; // the text to show inside a button when tag is 'button'
   style_rules?: IStyleRules;
   form_array_controls?: Array<IFormControl>; // this array of controls refers to what gets asked again in a form (could be only one control, or more)
   is_form_array?: true;
