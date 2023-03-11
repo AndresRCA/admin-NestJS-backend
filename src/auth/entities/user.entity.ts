@@ -1,4 +1,4 @@
-import { IsEmail, IsInt } from 'class-validator';
+import { IsEmail } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm'
 import { Session } from './session.entity';
 

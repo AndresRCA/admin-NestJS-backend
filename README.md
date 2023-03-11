@@ -150,3 +150,5 @@ If you'd like to collaborate on this project, there are some **policies** that I
     }
   }
   ```
+
+  > Do take into account that NestJS already handles **internal server errors** when they occur due to a failed promise or bad code, therefore unless you want to be more explicit with your error message, there is no need to wrap your code inside a `try catch` in order to specify that an internal server occurred like the one in the example above.

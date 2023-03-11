@@ -1,5 +1,5 @@
-import { Controller, Get, InternalServerErrorException, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiInternalServerErrorResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, InternalServerErrorException, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { FormsService } from './forms.service';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
 import { Form } from './entities/form.entity';
@@ -13,18 +13,25 @@ export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
   /**
-   * Return form(s) either through query parameters or none in order to get all of them
-   * @param name name of the form
-   * @returns Form with corresponding form groups
+   * Return form through query parameters, or use none in order to get all forms
+   * @param query a partial object of the Form entity
+   * @returns Form(s) with corresponding form groups
    */
   @Get()
   @ApiOkResponse({ description: 'Form with corresponding form groups', type: Form })
+  @ApiNotFoundResponse({ description: 'No resource was found' })
   async getForms(@Query() query: FormQueryDto): Promise<Form[] | Form | null> {
     if (Object.keys(query).length !== 0) {
-      return await this.formsService.findOne(query);
-    } else {
-      return await this.formsService.findAll();
+      // find by fields
+      const form = await this.formsService.findForm(query);
+      if (form) return form;
+      else throw new NotFoundException('The resource you were looking for could not be found');
     }
+
+    // find all when no fields are present
+    const forms = await this.formsService.findAllForms();
+    if (forms.length > 0) return forms;
+    else throw new NotFoundException('The resource you were looking for could not be found');
   }
 
   /**
@@ -34,8 +41,11 @@ export class FormsController {
    */
   @Get(':id')
   @ApiOkResponse({ description: 'Form with corresponding form groups', type: Form })
+  @ApiNotFoundResponse({ description: 'No resource was found' })
   async getForm(@Param('id') id: number): Promise<Form | null> {
-    return await this.formsService.findOne({ id });
+    const form = await this.formsService.findForm({ id });
+    if (form) return form;
+    else throw new NotFoundException('The resource you were looking for could not be found');
   }
 
   /**
@@ -48,12 +58,10 @@ export class FormsController {
    */
   @Get('abonado-registro')
   @ApiOkResponse({ description: 'Form and form groups with data included for client registration', type: Form })
-  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error, there was an issue with the code' })
   async abonadoRegistroForm(): Promise<Form> {
-    let registerClientForm = await this.formsService.findOne({ name: 'registro abonado' });
-    if (registerClientForm === null) {
-      throw new InternalServerErrorException('Internal server error', { description: "Couldn't find a form" })
-    }
+    let registerClientForm = await this.formsService.findForm({ name: 'registro abonado' });
+    if (registerClientForm === null) throw new InternalServerErrorException('Internal server error', { description: "Couldn't find a form" })
 
     for (let formGroup of registerClientForm.formGroups) {
       let fgName = formGroup.name;
