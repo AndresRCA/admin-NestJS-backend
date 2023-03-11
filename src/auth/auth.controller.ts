@@ -6,6 +6,7 @@ import { FastifyReply } from 'fastify';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
+import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -27,7 +28,16 @@ export class AuthController {
   @Post('signup')
   @ApiCreatedResponse()
   async createUser(@Body() newUser: createUserDto) {
-    await this.usersRepository.save(newUser);
+    let user = new User();
+    user.username = newUser.username;
+    user.password = this.authService.generateUserPassword(newUser.password);
+    user.email = newUser.email;
+
+    let session = new Session();
+    session.sessionToken = this.authService.generateUserSessionId();
+    user.session = session;
+
+    await this.usersRepository.save(user);
   }
 
   /**
@@ -37,7 +47,8 @@ export class AuthController {
   @Post('login')
   @ApiCreatedResponse()
   async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply) {
-    // return data for this username and session cookie
+    
+    console.log(req['user']);
     const user = req['user']! as User; // user comes from LocalAuthGuard strategy
     
     if (!user.session) { // if it's user first login, create a session row for them
@@ -45,7 +56,7 @@ export class AuthController {
       console.log('user has no session row')
     }
     
-    const sessionId = this.authService.generateUserSessionId()
+    const sessionId = this.authService.generateUserSessionId();
     user.session!.sessionToken = sessionId;
     this.usersRepository.save(user);
 

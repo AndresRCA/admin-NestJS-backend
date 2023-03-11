@@ -17,11 +17,11 @@ export class AuthService {
    * @param apiKey incoming X-API-Key header value
    * @returns true if incoming key value is valid
    */
-  validateApiKey(apiKey: string): boolean {
+  public validateApiKey(apiKey: string): boolean {
     return apiKey === this.configService.get('API_KEY');
   }
 
-  async validateUser(username: string, password: string): Promise<Partial<User> | null> {
+  public async validateUser(username: string, password: string): Promise<Partial<User> | null> {
     const user = await this.usersRepository.findOne({
       where: { username }
     });
@@ -34,7 +34,11 @@ export class AuthService {
     return null;
   }
 
-  generateUserSessionId(): string {
+  public generateUserPassword(password: string): string {
+    return password; // add proper hashing and cryptography later
+  }
+
+  public generateUserSessionId(): string {
     return uuidv4();
   }
 }
