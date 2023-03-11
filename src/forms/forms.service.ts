@@ -9,17 +9,18 @@ export class FormsService {
 
   constructor(@InjectRepository(Form) private formsRepository: Repository<Form>) {}
 
-  findAllForms(): Promise<Form[]> {
+  findAllForms(fields?: FormQueryDto): Promise<Form[]> {
     return this.formsRepository.find({
+      where: fields,
       relations: { // bring along the form groups
         formGroups: true
       }
     });
   }
 
-  findForm(form: FormQueryDto): Promise<Form | null> {
+  findForm(fields: FormQueryDto): Promise<Form | null> {
     return this.formsRepository.findOne({
-      where: form, 
+      where: fields, 
       relations: { // bring along the form groups
         formGroups: true
       }

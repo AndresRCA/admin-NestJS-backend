@@ -4,6 +4,7 @@ import { FormsService } from './forms.service';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
 import { Form } from './entities/form.entity';
 import { FormQueryDto } from './dto/form-query.dto';
+import { FormGroup } from './entities/form-group.entity';
 
 @ApiTags('forms')
 @ApiSecurity('X-API-Key')
@@ -13,23 +14,15 @@ export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
   /**
-   * Return form through query parameters, or use none in order to get all forms
+   * Return forms that match the query parameters passed by the request
    * @param query a partial object of the Form entity
    * @returns Form(s) with corresponding form groups
    */
   @Get()
-  @ApiOkResponse({ description: 'Form with corresponding form groups', type: Form })
+  @ApiOkResponse({ description: 'Form with corresponding form groups', type: Form, isArray: true })
   @ApiNotFoundResponse({ description: 'No resource was found' })
-  async getForms(@Query() query: FormQueryDto): Promise<Form[] | Form | null> {
-    if (Object.keys(query).length !== 0) {
-      // find by fields
-      const form = await this.formsService.findForm(query);
-      if (form) return form;
-      else throw new NotFoundException('The resource you were looking for could not be found');
-    }
-
-    // find all when no fields are present
-    const forms = await this.formsService.findAllForms();
+  async getForms(@Query() query: FormQueryDto): Promise<Form[]> {
+    const forms = await this.formsService.findAllForms(query);
     if (forms.length > 0) return forms;
     else throw new NotFoundException('The resource you were looking for could not be found');
   }
@@ -42,11 +35,25 @@ export class FormsController {
   @Get(':id')
   @ApiOkResponse({ description: 'Form with corresponding form groups', type: Form })
   @ApiNotFoundResponse({ description: 'No resource was found' })
-  async getForm(@Param('id') id: number): Promise<Form | null> {
+  async getForm(@Param('id') id: number): Promise<Form> {
     const form = await this.formsService.findForm({ id });
     if (form) return form;
     else throw new NotFoundException('The resource you were looking for could not be found');
   }
+
+  /**
+   * Returns form with the provided id
+   * @param id 
+   * @returns Form with given id
+   */
+   @Get(':id/form-groups')
+   @ApiOkResponse({ description: 'Form with corresponding form groups', type: Array<FormGroup> })
+   @ApiNotFoundResponse({ description: 'No resource was found' })
+   async getFormGroup(@Param('id') id: number): Promise<FormGroup[]> {
+     const form = await this.formsService.findForm({ id });
+     if (form) return form.formGroups;
+     else throw new NotFoundException('The resource you were looking for could not be found');
+   }
 
   /**
    * Return the following form format (form groups) and data regarding client registration:
