@@ -22,6 +22,7 @@
     "typeorm:prod": "cross-env NODE_ENV=production typeorm-ts-node-commonjs"
   },
   "dependencies": {
+    "@fastify/cookie": "^8.3.0",
     "@fastify/helmet": "^10.1.0",
     "@fastify/static": "^6.8.0",
     "@nestjs/common": "^9.0.0",

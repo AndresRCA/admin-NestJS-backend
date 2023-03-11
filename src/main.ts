@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/
 import { ConfigService } from '@nestjs/config';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ValidationPipe } from '@nestjs/common';
+import fastifyCookie from '@fastify/cookie';
 
 declare const module: any; // used for hot reload (see https://docs.nestjs.com/recipes/hot-reload#hot-module-replacement)
 
@@ -22,7 +23,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   /*--- security middleware ---*/
-  app.register(helmet, { // When using fastify and helmet, there may be a problem with CSP, this is how to solve this collision (with swagger)
+  await app.register(helmet, { // When using fastify and helmet, there may be a problem with CSP, this is how to solve this collision (with swagger)
     contentSecurityPolicy: {
       directives: {
         defaultSrc: [`'self'`],
@@ -33,6 +34,16 @@ async function bootstrap() {
     },
   });
   app.enableCors();
+  /*---------------------------*/
+
+  /*----- cookies parsing -----*/
+  await app.register(fastifyCookie, {
+    parseOptions: {
+      secure: configService.get('NODE_ENV') === 'production',
+      httpOnly: true
+    },
+    secret: configService.get('COOKIE_SECRET'), // for cookies signature
+  });
   /*---------------------------*/
 
   // employ nestjs request body validation using DTOs
