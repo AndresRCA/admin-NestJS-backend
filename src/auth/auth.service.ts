@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
     return apiKey === this.configService.get('API_KEY');
   }
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(username: string, password: string): Promise<Partial<User> | null> {
     const user = await this.usersRepository.findOne({
       where: { username }
     });
@@ -31,5 +32,9 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  generateUserSessionId(): string {
+    return uuidv4();
   }
 }
