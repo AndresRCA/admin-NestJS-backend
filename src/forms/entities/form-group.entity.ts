@@ -1,3 +1,5 @@
+import { Type } from 'class-transformer';
+import { IsJSON, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
 import { IFormControl } from '../interfaces/IFormControl.interface';
 import { IStyleRules } from '../interfaces/IStyleRules.interface';
@@ -5,12 +7,18 @@ import { Form } from './form.entity';
 
 @Entity({ schema: 'forms' })
 export class FormGroup {
+  @IsNotEmpty()
+  @Type(() => Number) // for transforming the string value that comes from a request
   @PrimaryGeneratedColumn({ type: "int" })
   id: number;
 
+  @IsNotEmpty()
+  @IsString()
   @Column()
   name: string;
 
+  @IsNotEmpty()
+  @IsNumber()
   @Column({
     nullable: false,
     type: 'int'
