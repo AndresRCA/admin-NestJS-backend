@@ -16,7 +16,6 @@ import { Form } from './forms/entities/form.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { User } from './auth/entities/user.entity';
 import { Session } from './auth/entities/session.entity';
-import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -63,7 +62,6 @@ import { UsersModule } from './users/users.module';
     }),
     AuthModule,
     FormsModule,
-    UsersModule,
   ],
   controllers: [AppController],
   providers: [
