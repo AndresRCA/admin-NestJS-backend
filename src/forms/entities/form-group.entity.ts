@@ -29,10 +29,11 @@ export class FormGroup {
     type: 'json',
     comment: 'JSON object with rules that define the styling characteristics of this form'
   })
-  style_rules?: IStyleRules;
+  styleRules?: IStyleRules;
 
   @ManyToOne(() => Form, (form) => form.formGroups, {
-    cascade: ["remove"]
+    cascade: true, // using a single entity (Form), allow operations to related tables like this one
+    onDelete: "CASCADE" // when Form is removed, delete all form groups
   })
   form: Form;
 }

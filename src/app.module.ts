@@ -14,6 +14,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FormGroup } from './forms/entities/form-group.entity';
 import { Form } from './forms/entities/form.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { User } from './auth/entities/user.entity';
+import { Session } from './auth/entities/session.entity';
 
 @Module({
   imports: [
@@ -48,7 +50,9 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         database: configService.get('database.name'),
         entities: [
           Form,
-          FormGroup
+          FormGroup,
+          User,
+          Session
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
         migrations: ['../migrations/*{.ts,.js}'],
