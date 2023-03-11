@@ -4,7 +4,7 @@ import { HeaderAPIKeyStrategy } from "passport-headerapikey";
 import { AuthService } from "../auth.service";
 
 /**
- * Strategy for checking X-API-Key header's value. Throws UnauthorizedException() when value is not valid
+ * ApiKeyStrategy is a strategy for checking X-API-Key header's value. Throws UnauthorizedException() when value is not valid
  */
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(HeaderAPIKeyStrategy) {

@@ -1,10 +1,11 @@
 import { Controller, Get, InternalServerErrorException, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiInternalServerErrorResponse, ApiOkResponse, ApiSecurity } from '@nestjs/swagger';
+import { ApiInternalServerErrorResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { FormsService } from './forms.service';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
 import { Form } from './entities/form.entity';
 import { FormQueryDto } from './dto/form-query.dto';
 
+@ApiTags('forms')
 @ApiSecurity('X-API-Key')
 @UseGuards(ApiKeyAuthGuard)
 @Controller('forms')

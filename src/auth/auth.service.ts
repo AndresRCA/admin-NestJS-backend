@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserQueryDto } from './dto/user-query.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -21,9 +20,16 @@ export class AuthService {
     return apiKey === this.configService.get('API_KEY');
   }
 
-  findUser(user: UserQueryDto): Promise<User | null> {
-    return this.usersRepository.findOne({
-      where: user
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.usersRepository.findOne({
+      where: { username }
     });
+
+    if (user && user.password === password) {
+      const { password, ...result } = user; // result is the user object but without the password
+      return result;
+    }
+
+    return null;
   }
 }
