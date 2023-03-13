@@ -28,15 +28,8 @@ export class AuthController {
   @Post('signup')
   @ApiCreatedResponse()
   async createUser(@Body() newUser: createUserDto) {
-    let user = new User();
-    user.username = newUser.username;
+    let user = this.usersRepository.create(newUser);
     user.password = this.authService.generateUserPassword(newUser.password);
-    user.email = newUser.email;
-
-    let session = new Session();
-    session.sessionToken = this.authService.generateUserSessionId();
-    user.session = session;
-
     await this.usersRepository.save(user);
   }
 
@@ -47,22 +40,18 @@ export class AuthController {
   @Post('login')
   @ApiCreatedResponse()
   async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply) {
-    
-    console.log(req['user']);
     const user = req['user']! as User; // user comes from LocalAuthGuard strategy
     
-    if (!user.session) { // if it's user first login, create a session row for them
-      // test first
-      console.log('user has no session row')
-    }
+     // if it's user first login, create a session row for them
+    if (!user.session) user.session = new Session();
     
-    const sessionId = this.authService.generateUserSessionId();
-    user.session!.sessionToken = sessionId;
-    this.usersRepository.save(user);
+    const sessionToken = this.authService.generateUserSessionId();
+    user.session.sessionToken = sessionToken;
+    await this.usersRepository.save(user);
 
     res.setCookie(
       this.configService.get('SESSION_ID_NAME') as string,
-      sessionId,
+      sessionToken,
       { maxAge: 20 } // expires in 20 seconds
     );
   }

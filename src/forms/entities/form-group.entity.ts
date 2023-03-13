@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsJSON, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
 import { IFormControl } from '../interfaces/IFormControl.interface';
 import { IStyleRules } from '../interfaces/IStyleRules.interface';
