@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
+import { Module } from './module.entity';
 import { Session } from './session.entity';
 
 @Entity({ schema: 'auth' })
@@ -40,6 +41,16 @@ export class User {
   })
   @JoinColumn() // required decorator for OneToOne
   session?: Session;
+
+  /**
+   * User modules that are displayed in the dashboard
+   */
+  @ManyToMany(() => Module, {
+    nullable: true,
+    cascade: true
+  })
+  @JoinTable()
+  modules?: Module[]
 
   @IsDate()
   @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })

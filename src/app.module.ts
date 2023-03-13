@@ -16,6 +16,8 @@ import { Form } from './forms/entities/form.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { User } from './auth/entities/user.entity';
 import { Session } from './auth/entities/session.entity';
+import { Module as UserModule } from './auth/entities/module.entity';
+import { SubModule } from './auth/entities/sub-module.entity';
 
 @Module({
   imports: [
@@ -52,7 +54,9 @@ import { Session } from './auth/entities/session.entity';
           Form,
           FormGroup,
           User,
-          Session
+          Session,
+          UserModule,
+          SubModule
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
         migrations: ['../migrations/*{.ts,.js}'],
