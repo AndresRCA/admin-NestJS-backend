@@ -6,9 +6,10 @@ import { ApiKeyStrategy } from './strategies/api-key.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { LocalStrategy } from './strategies/local.strategy';
+import { Session } from './entities/session.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), PassportModule],
+  imports: [TypeOrmModule.forFeature([User, Session]), PassportModule],
   providers: [AuthService, ApiKeyStrategy, LocalStrategy],
   controllers: [AuthController]
 })

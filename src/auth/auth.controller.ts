@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiCreatedResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,7 @@ import { createUserDto } from './dto/create-user.dto';
 import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
+import { CookiesAuthGuard } from './guards/cookies-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @ApiTags('auth')
@@ -52,7 +53,14 @@ export class AuthController {
     res.setCookie(
       this.configService.get('SESSION_ID_NAME') as string,
       sessionToken,
-      { maxAge: 20 } // expires in 20 seconds
+      { maxAge: 60 } // expires in 20 seconds
     );
+  }
+
+  @UseGuards(CookiesAuthGuard)
+  @Get('cookie-guarded')
+  forbiddenResource(@Req() req: any) {
+    console.log('user?', req['user'])
+    console.log('req', req)
   }
 }

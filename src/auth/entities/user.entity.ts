@@ -37,7 +37,7 @@ export class User {
     nullable: true,
     cascade: true, // using a single entity (Form), allow operations to related tables like this one
     onDelete: "CASCADE" // when Form is removed, delete all form groups
-  }) // enable bi-directional relation (we want to access user if we have a session)
+  })
   @JoinColumn() // required decorator for OneToOne
   session?: Session;
 

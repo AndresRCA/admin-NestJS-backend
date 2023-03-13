@@ -10,10 +10,8 @@ import { AuthService } from "../auth.service";
 export class ApiKeyStrategy extends PassportStrategy(HeaderAPIKeyStrategy) {
   constructor(private readonly authService: AuthService) {
     super({ header: 'X-API-Key', prefix: '' }, true, async (apiKey: string, done: Function) => {
-      if (this.authService.validateApiKey(apiKey)) {
-        done(null, true);
-      }
-      done(new UnauthorizedException(), null);
+      if (this.authService.validateApiKey(apiKey)) done(null, true);
+      else done(new UnauthorizedException(), null);
     });
 
   }
