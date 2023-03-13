@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, ConflictException, Controller, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiCreatedResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FastifyReply } from 'fastify';
+import { Cookies } from 'src/decorators/cookies.decorator';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
@@ -32,7 +33,20 @@ export class AuthController {
   async createUser(@Body() newUser: createUserDto) {
     let user = this.usersRepository.create(newUser);
     user.password = this.authService.generateUserPassword(newUser.password);
-    await this.usersRepository.save(user);
+
+    try {
+      await this.usersRepository.save(user);
+    } catch (error) { // user already exists or something went wrong with the database
+      let errorDescription = 'Unknown error';
+      if (error.detail.includes('username')) {
+        errorDescription = 'That username is already taken';
+      }
+      if (error.detail.includes('email')) {
+        errorDescription = 'That email is already taken';
+      }
+      // http code 409
+      throw new ConflictException('This user already exists', { cause: error, description: errorDescription })
+    }
   }
 
   /**
@@ -62,6 +76,16 @@ export class AuthController {
 
     const { session, updatedAt, ...response } = user;
     return response;
+  }
+
+  // guard should return a reference to the user)
+  // @UseGuards(CookiesAuthGuard) make sure the correct user is logging out
+  @Put('logout')
+  async logout(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply, @Cookies() cookies: any) {
+    const currentSessionToken: string = cookies[this.configService.get('SESSION_ID_NAME') as string];
+    console.log('log out sessionToken:', currentSessionToken);
+    await this.sessionsRepository.update({ sessionToken: currentSessionToken }, { sessionToken: undefined })
+    res.clearCookie(this.configService.get('SESSION_ID_NAME') as string);
   }
 
   @UseGuards(CookiesAuthGuard)

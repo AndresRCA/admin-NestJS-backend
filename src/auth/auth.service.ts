@@ -41,8 +41,6 @@ export class AuthService {
       }
     });
 
-    console.log('found user in login', user);
-
     const encryptedPassword = this.generateUserPassword(password);
     if (user && user.password === encryptedPassword) {
       const { password, ...result } = user; // result is the user object but without the password
@@ -76,7 +74,7 @@ export class AuthService {
   }
 
   /**
-   * 
+   * Generate an encrypted password to store into the database
    * @param password 
    * @returns encrypted password
    */
