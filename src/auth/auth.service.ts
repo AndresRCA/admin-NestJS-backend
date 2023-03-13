@@ -25,18 +25,28 @@ export class AuthService {
 
   /**
    * Checks wether a user exists and returns it when it does
+   * IMPORTANT: the user returned in this function is the one the client will have access to, so make sure to avoid sending sensitive data like
+   * password or session info, and on the other hand make sure to send data that might be relevant to the like such as dashboard modules
    * @param username 
    * @param password 
    * @returns returns user if it exists, null otherwise
    */
-  public async validateUser(username: string, password: string): Promise<Omit<User, 'password'> | null> {
+  public async validateUser(username: string, password: string): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'> | null> {
     const user = await this.usersRepository.findOne({
-      where: { username }
+      select: ['id', 'username', 'password', 'email'],
+      where: { username },
+      relations: { // bring anything related to the user that might be relevant to the client
+        modules: true, // dashboard modules
+        session: true
+      }
     });
 
-    if (user && user.password === password) {
+    console.log('found user in login', user);
+
+    const encryptedPassword = this.generateUserPassword(password);
+    if (user && user.password === encryptedPassword) {
       const { password, ...result } = user; // result is the user object but without the password
-      return result;
+      return result as Pick<User, 'id' | 'username' | 'email' | 'modules'>; // return user with only these properties
     }
 
     return null;
@@ -51,7 +61,11 @@ export class AuthService {
     if (!sessionToken) return null; // user doesn't even have the session id cookie (either it expired or they never had it in the first place)
 
     // find a session with sessionToken
-    let session = await this.sessionsRepository.findOne({ where: { sessionToken }, relations: { user: true } });
+    let session = await this.sessionsRepository.findOne({
+      where: { sessionToken },
+      relations: { user: true }
+    });
+
     console.log('found session:', session);
     if (session) {
       const { password, ...result } = session.user;
@@ -61,10 +75,19 @@ export class AuthService {
     return null;
   }
 
+  /**
+   * 
+   * @param password 
+   * @returns encrypted password
+   */
   public generateUserPassword(password: string): string {
     return password; // add proper hashing and cryptography later
   }
 
+  /**
+   * Generates an uuid that identifies a user session
+   * @returns uuid string
+   */
   public generateUserSessionId(): string {
     return uuidv4();
   }

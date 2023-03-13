@@ -11,19 +11,13 @@ export class FormsService {
 
   findAllForms(fields?: FormQueryDto): Promise<Form[]> {
     return this.formsRepository.find({
-      where: fields,
-      relations: { // bring along the form groups
-        formGroups: true
-      }
+      where: fields
     });
   }
 
   findForm(fields: FormQueryDto): Promise<Form | null> {
     return this.formsRepository.findOne({
-      where: fields, 
-      relations: { // bring along the form groups
-        formGroups: true
-      }
+      where: fields
     });
   }
 

@@ -20,7 +20,8 @@ export class AuthController {
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
-    @InjectRepository(User) private usersRepository: Repository<User>
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Session) private sessionsRepository: Repository<Session>
   ) { }
   
   /**
@@ -40,12 +41,15 @@ export class AuthController {
   @UseGuards(LocalAuthGuard) // checks for username and password in body of request
   @Post('login')
   @ApiCreatedResponse()
-  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply) {
-    const user = req['user']! as User; // user comes from LocalAuthGuard strategy
+  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules'>> {
+    const user = req['user']! as User; // user comes from LocalAuthGuard strategy (should be of type Pick<User, 'id' | 'username' | 'email' | 'modules'>)
     
-     // if it's user first login, create a session row for them
-    if (!user.session) user.session = new Session();
-    
+    // if it's user first login, create a session row for them
+    if (!user.session) {
+      console.log('new session created');
+      user.session = new Session();
+    }
+
     const sessionToken = this.authService.generateUserSessionId();
     user.session.sessionToken = sessionToken;
     await this.usersRepository.save(user);
@@ -55,6 +59,9 @@ export class AuthController {
       sessionToken,
       { maxAge: 60 } // expires in 20 seconds
     );
+
+    const { session, updatedAt, ...response } = user;
+    return response;
   }
 
   @UseGuards(CookiesAuthGuard)

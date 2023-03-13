@@ -18,6 +18,6 @@ export class Form {
   })
   name: string;
 
-  @OneToMany(() => FormGroup, (formGroup) => formGroup.form)
+  @OneToMany(() => FormGroup, (formGroup) => formGroup.form, { eager: true }) // when fetching forms, always bring along the form groups
   formGroups: FormGroup[]
 }
