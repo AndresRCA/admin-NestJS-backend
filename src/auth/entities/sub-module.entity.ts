@@ -7,7 +7,7 @@ import { Module } from './module.entity';
 @Entity({
   schema: 'auth',
   orderBy: { // returns subModules ordered by their column `order`
-    order: "ASC"
+    order: "DESC"
   }
 })
 export class SubModule {

@@ -38,6 +38,13 @@ export class AuthService {
       relations: { // bring anything related to the user that might be relevant to the client
         modules: true, // dashboard modules
         session: true
+      },
+      order: {
+        modules: {
+          subModules: {
+            order: "ASC"
+          }
+        }
       }
     });
 

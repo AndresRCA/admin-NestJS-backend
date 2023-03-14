@@ -17,7 +17,12 @@ export class FormsService {
 
   findForm(fields: FormQueryDto): Promise<Form | null> {
     return this.formsRepository.findOne({
-      where: fields
+      where: fields,
+      order: {
+        formGroups: { // returns form groups ordered by their column `order`
+          order: 'ASC'
+        }
+      }
     });
   }
 
