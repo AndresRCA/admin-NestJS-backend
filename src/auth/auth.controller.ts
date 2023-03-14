@@ -1,12 +1,13 @@
 import { Body, ConflictException, Controller, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiCreatedResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiConflictResponse, ApiCreatedResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse, PickType } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FastifyReply } from 'fastify';
 import { Cookies } from 'src/decorators/cookies.decorator';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
 import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
@@ -29,7 +30,8 @@ export class AuthController {
    * User registration
    */
   @Post('signup')
-  @ApiCreatedResponse()
+  @ApiCreatedResponse({ description: 'User could sign up without any issues and a new user was made' })
+  @ApiConflictResponse({ description: 'User already exists' })
   async createUser(@Body() newUser: createUserDto) {
     let user = this.usersRepository.create(newUser);
     user.password = this.authService.generateUserPassword(newUser.password);
@@ -54,8 +56,9 @@ export class AuthController {
    */
   @UseGuards(LocalAuthGuard) // checks for username and password in body of request
   @Post('login')
-  @ApiCreatedResponse()
-  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules'>> {
+  @ApiCreatedResponse({ description: 'User logged in without any issues and User object was returned', type: LoginDto })
+  @ApiUnauthorizedResponse({ description: 'Login attempt failed' })
+  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<LoginDto> {
     const user = req['user']! as User; // user comes from LocalAuthGuard strategy (should be of type Pick<User, 'id' | 'username' | 'email' | 'modules'>)
     
     // if it's user first login, create a session row for them
@@ -81,6 +84,8 @@ export class AuthController {
   // guard should return a reference to the user)
   // @UseGuards(CookiesAuthGuard) make sure the correct user is logging out
   @Put('logout')
+  @ApiCreatedResponse({ description: 'User succesfully logged out and their means of authentication was stripped away' })
+  @ApiUnauthorizedResponse({ description: 'Non-current user tried to log out' })
   async logout(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply, @Cookies() cookies: any) {
     const currentSessionToken: string = cookies[this.configService.get('SESSION_ID_NAME') as string];
     console.log('log out sessionToken:', currentSessionToken);
