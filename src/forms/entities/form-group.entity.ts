@@ -5,7 +5,12 @@ import { IFormControl } from '../interfaces/IFormControl.interface';
 import { IStyleRules } from '../interfaces/IStyleRules.interface';
 import { Form } from './form.entity';
 
-@Entity({ schema: 'forms' })
+@Entity({
+  schema: 'forms',
+  orderBy: { // returns form groups ordered by their column `order`
+    order: "ASC"
+  }
+})
 export class FormGroup {
   @IsNotEmpty()
   @Type(() => Number) // for transforming the string value that comes from a request

@@ -4,7 +4,12 @@ import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Module } from './module.entity';
 
-@Entity({ schema: 'auth' })
+@Entity({
+  schema: 'auth',
+  orderBy: { // returns subModules ordered by their column `order`
+    order: "ASC"
+  }
+})
 export class SubModule {
   @IsNotEmpty()
   @Type(() => Number) // for transforming the string value that comes from a request
