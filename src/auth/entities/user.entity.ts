@@ -52,6 +52,12 @@ export class User {
   @JoinTable()
   modules?: Module[]
 
+  @Column({
+    nullable: false,
+    default: true
+  })
+  active: boolean;
+
   @IsDate()
   @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

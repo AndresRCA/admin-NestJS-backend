@@ -44,6 +44,12 @@ export class SubModule {
   })
   styleRules?: Pick<IStyleRules, 'icon'>;
 
+  @Column({
+    nullable: false,
+    default: true
+  })
+  active: boolean;
+
   @ManyToOne(() => Module, (module) => module.subModules, {
     cascade: true,
     onDelete: "CASCADE"

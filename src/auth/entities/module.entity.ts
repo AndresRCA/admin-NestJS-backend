@@ -26,6 +26,12 @@ export class Module {
   })
   styleRules?: Pick<IStyleRules, 'icon'>;
 
+  @Column({
+    nullable: false,
+    default: true
+  })
+  active: boolean
+
   @OneToMany(() => SubModule, (subModule) => subModule.module, { eager: true }) // when fetching modules, always bring along the sub-modules
   subModules: SubModule[]
 }

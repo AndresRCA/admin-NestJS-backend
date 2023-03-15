@@ -34,9 +34,17 @@ export class AuthService {
   public async validateUser(username: string, password: string): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'> | null> {
     const user = await this.usersRepository.findOne({
       select: ['id', 'username', 'password', 'email'],
-      where: { username },
+      where: {
+        username,
+        // modules: { // bring only modules which are active
+        //   active: true,
+        //   subModules: {
+        //     active: true
+        //   }
+        // }
+      },
       relations: { // bring anything related to the user that might be relevant to the client
-        modules: true, // dashboard modules
+        modules: true, // dashboard modules (submodules are set to eager, so they will also come)
         session: true
       },
       order: {
