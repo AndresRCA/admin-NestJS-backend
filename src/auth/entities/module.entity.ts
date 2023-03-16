@@ -1,10 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
 import { SubModule } from './sub-module.entity';
 
-@Entity({ schema: 'auth' })
+@Entity({
+  schema: 'auth',
+  orderBy: { // returns modules ordered by their column `order`
+    order: "ASC"
+  }
+})
 export class Module {
   @IsNotEmpty()
   @Type(() => Number) // for transforming the string value that comes from a request
@@ -18,6 +23,22 @@ export class Module {
     unique: true
   })
   name: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Column({
+    nullable: false,
+    type: 'int'
+  })
+  order: number;
+
+  @IsNotEmpty()
+  @IsString()
+  @Column({
+    nullable: true,
+    comment: "route used in the frontend to access the module's view (if route isn't null, this module shouldn't possess any submodules)"
+  })
+  route?: string;
   
   @Column({
     nullable: true,
