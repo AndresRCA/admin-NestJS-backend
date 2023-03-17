@@ -50,7 +50,6 @@ export class AuthService {
         }
       }
     });
-    console.log(user)
 
     const encryptedPassword = this.generateUserPassword(password);
     if (user && user.password === encryptedPassword) {
@@ -78,7 +77,6 @@ export class AuthService {
       }
     });
 
-    console.log('found session:', session);
     if (session) {
       const { createdAt, updatedAt, password, active, ...user } = session.user;
       return user; // return user
