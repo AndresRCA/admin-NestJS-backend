@@ -87,9 +87,9 @@ export class FormsController {
           formGroupData = this.formsService.getDirectionsDataFormData();
           break;
 
-        // case 'datos de residencia':
-        //   formGroupData = this.formsService.getDirectionsDataFormData();
-        //   break;
+        case 'datos de residencia':
+          formGroupData = this.formsService.getResidenceDataFormData();
+          break;
       }
       if(!formGroupData) continue;
 
