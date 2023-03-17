@@ -70,6 +70,7 @@ export class FormsController {
     let registerClientForm = await this.formsService.findForm({ name: 'registro abonado' });
     if (registerClientForm === null) throw new InternalServerErrorException('Internal server error', { description: "Couldn't find a form" })
 
+    // fill form groups with data according to the name of the form
     for (let formGroup of registerClientForm.formGroups) {
       let fgName = formGroup.name;
       let formGroupData;
@@ -92,8 +93,15 @@ export class FormsController {
       }
       if(!formGroupData) continue;
 
+      // append the data to our form controls that came from the json
       for (let control of formGroup.controls) {
-        if (control.data !== undefined) {
+        if (control.is_form_array) {
+          for (let groupControl of control.form_array_controls!) {
+            if (groupControl.data !== undefined) {
+              groupControl.data = formGroupData[groupControl.name];
+            }
+          }
+        } else if (control.data !== undefined) {
           control.data = formGroupData[control.name];
         }
       }

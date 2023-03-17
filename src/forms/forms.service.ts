@@ -31,8 +31,8 @@ export class FormsService {
    */
   getContractDataFormData() {
     return {
-      tipo_abonado: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}], // control_name: Array<data>
-      tipo_facturacion: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      tipo_abonado: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      tipo_facturacion: [{name: 'Ej 1', value: 1},{name: 'Ej 2', value: 2}],
       franquicia: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}],
       grupo_afinidad: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}],
       vendedor: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}]
@@ -41,14 +41,25 @@ export class FormsService {
 
   getClientDataFormData(): any {
     return {
-      tipo_cliente: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}], // control_name: Array<data>
+      tipo_cliente: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}],
       tipo_doc: [{name: 'Ej 1', value: 'val1'},{name: 'Ej 2', value: 'val2'}]
     }
   }
 
   getDirectionsDataFormData(): any {
     return {
-      residencia: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}]
+      departamento: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      ciudad_municipio: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      zona: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      sector: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      nomeclatura: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+      valor: [{name: 'Ej 1', value: true},{name: 'Ej 2', value: false}],
+    }
+  }
+
+  getResidenceDataFormData(): any {
+    return {
+      residencia: [{name: 'Ej 1', value: 1},{name: 'Ej 2', value: false}],
     }
   }
 }
