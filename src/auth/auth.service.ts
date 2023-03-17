@@ -35,26 +35,22 @@ export class AuthService {
     const user = await this.usersRepository.findOne({
       select: ['id', 'username', 'password', 'email'],
       where: {
-        username,
-        // modules: { // bring only modules which are active
-        //   active: true,
-        //   subModules: {
-        //     active: true
-        //   }
-        // }
+        username
       },
       relations: { // bring anything related to the user that might be relevant to the client
         modules: true, // dashboard modules (submodules are set to eager, so they will also come)
         session: true
       },
-      order: {
+      order: { // order by the `order` column of `modules` and `sub_modules`
         modules: {
+          order: "ASC",
           subModules: {
             order: "ASC"
           }
         }
       }
     });
+    console.log(user)
 
     const encryptedPassword = this.generateUserPassword(password);
     if (user && user.password === encryptedPassword) {
@@ -70,19 +66,22 @@ export class AuthService {
    * @param sessionToken 
    * @returns User
    */
-  public async validateUserSession(sessionToken: string | undefined): Promise<Omit<User, 'password'> | null> {
+  public async validateUserSession(sessionToken: string | undefined): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules'> | null> {
     if (!sessionToken) return null; // user doesn't even have the session id cookie (either it expired or they never had it in the first place)
-
-    // find a session with sessionToken
+    
     let session = await this.sessionsRepository.findOne({
       where: { sessionToken },
-      relations: { user: true }
+      relations: {
+        user: {
+          modules: true
+        }
+      }
     });
 
     console.log('found session:', session);
     if (session) {
-      const { password, ...result } = session.user;
-      return result; // return user
+      const { createdAt, updatedAt, password, active, ...user } = session.user;
+      return user; // return user
     }
 
     return null;

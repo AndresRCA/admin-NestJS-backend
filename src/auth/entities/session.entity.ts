@@ -7,9 +7,13 @@ export class Session {
   @PrimaryGeneratedColumn({ type: "int" })
   id: number;
 
+  
   @IsUUID()
-  @Column({ nullable: true, type: 'uuid' })
-  sessionToken?: string;
+  @Column({
+    nullable: true,
+    type: 'uuid'
+  })
+  sessionToken?: string | null;
 
   @OneToOne(() => User, (user) => user.session)
   user: User;

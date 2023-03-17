@@ -42,7 +42,7 @@ export class SubModule {
     type: 'json',
     comment: 'JSON object with rules that define the styling characteristics of the submodule (like the icon that accompanies the name)'
   })
-  styleRules?: Pick<IStyleRules, 'icon'>;
+  styleRules?: Pick<IStyleRules, 'icon'> | null;
 
   @Column({
     nullable: false,

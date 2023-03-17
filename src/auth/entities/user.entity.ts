@@ -40,7 +40,7 @@ export class User {
     onDelete: "CASCADE" // when Form is removed, delete all form groups
   })
   @JoinColumn() // required decorator for OneToOne
-  session?: Session;
+  session?: Session | null;
 
   /**
    * User modules that are displayed in the dashboard
@@ -50,7 +50,7 @@ export class User {
     cascade: true
   })
   @JoinTable()
-  modules?: Module[]
+  modules?: Module[] | null;
 
   @Column({
     nullable: false,

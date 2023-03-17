@@ -42,7 +42,7 @@ export class FormGroup {
     type: 'json',
     comment: 'JSON object with rules that define the styling characteristics of this form'
   })
-  styleRules?: IStyleRules;
+  styleRules?: IStyleRules | null;
 
   @ManyToOne(() => Form, (form) => form.formGroups, {
     cascade: true, // using a single entity (Form), allow operations to related tables like this one

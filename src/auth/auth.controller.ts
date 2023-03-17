@@ -1,6 +1,6 @@
 import { Body, ConflictException, Controller, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiConflictResponse, ApiCreatedResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse, PickType } from '@nestjs/swagger';
+import { ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse, PickType } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FastifyReply } from 'fastify';
 import { Cookies } from 'src/decorators/cookies.decorator';
@@ -11,8 +11,8 @@ import { LoginDto } from './dto/login.dto';
 import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
-import { CookiesAuthGuard } from './guards/cookies-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { SessionAuthGuard } from './guards/session-auth.guard';
 
 @ApiTags('auth')
 @ApiSecurity('X-API-Key')
@@ -59,7 +59,7 @@ export class AuthController {
   @ApiCreatedResponse({ description: 'User logged in without any issues and User object was returned', type: LoginDto })
   @ApiUnauthorizedResponse({ description: 'Login attempt failed' })
   async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<LoginDto> {
-    const user = req['user']! as User; // user comes from LocalAuthGuard strategy (should be of type Pick<User, 'id' | 'username' | 'email' | 'modules'>)
+    const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'>; // user comes from LocalAuthGuard strategy
     
     // if it's user first login, create a session row for them
     if (!user.session) {
@@ -74,29 +74,42 @@ export class AuthController {
     res.setCookie(
       this.configService.get('SESSION_ID_NAME') as string,
       sessionToken,
-      { maxAge: 60 } // expires in 20 seconds
+      { maxAge: 604800 } // maxAge is in seconds, so 604800s = 1 week
     );
 
-    const { session, updatedAt, ...response } = user;
+    const { session, ...response } = user;
     return response;
   }
 
-  // guard should return a reference to the user)
-  // @UseGuards(CookiesAuthGuard) make sure the correct user is logging out
+  @UseGuards(SessionAuthGuard) // guard should return a reference to the user
   @Put('logout')
   @ApiCreatedResponse({ description: 'User succesfully logged out and their means of authentication was stripped away' })
   @ApiUnauthorizedResponse({ description: 'Non-current user tried to log out' })
-  async logout(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply, @Cookies() cookies: any) {
+  async logout(@Res({ passthrough: true }) res: FastifyReply, @Cookies() cookies: any) {
     const currentSessionToken: string = cookies[this.configService.get('SESSION_ID_NAME') as string];
     console.log('log out sessionToken:', currentSessionToken);
-    await this.sessionsRepository.update({ sessionToken: currentSessionToken }, { sessionToken: undefined })
-    res.clearCookie(this.configService.get('SESSION_ID_NAME') as string);
+    await this.sessionsRepository.update({ sessionToken: currentSessionToken }, { sessionToken: null })
+
+    // because res.clearCookie() is not working, let's do it this way
+    res.setCookie(
+      this.configService.get('SESSION_ID_NAME') as string,
+      '',
+      { maxAge: 0 }
+    );
   }
 
-  @UseGuards(CookiesAuthGuard)
-  @Get('cookie-guarded')
-  forbiddenResource(@Req() req: any) {
-    console.log('user?', req['user'])
-    console.log('req', req)
+  /**
+   * Retrieve data for user related to the session token passed by the client
+   * @param req 
+   * @returns User data for current session
+   */
+  @UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request
+  @Get('user-session')
+  @ApiOkResponse({ description: 'User had a valid session token', type: LoginDto })
+  @ApiForbiddenResponse({ description: "Session token wasn't valid" })
+  async userSession(@Req() req: any): Promise<LoginDto> {
+    const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'>; // user comes from SessionGuard
+    const { session, ...result } = user; // take away the session
+    return result;
   }
 }
