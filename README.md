@@ -22,6 +22,12 @@ This backend posses all sort of security measures against dangers such as DoS (D
 * Passport ✅
   * API Key Authorization Strategy ✅
 * Request Body Validation ✅
+  * Automatic pipe validation ✅
+  * class-validator ✅
+  * PickType(), OmitType() ✅
+  * Safe query based resource lookup: ✅
+    * This is OK: `/forms?name=my%20form` ✔️
+    * This is not OK: `/forms?createdAt=2015-03-23-09.41.24.684842` ❌
 
 > **IMPORTANT**: To establish a communication with some enpoints, the client MUST add to his HTTP request headers the header `X-API-Key`, the value should also be the same as the one defined in the `.env` files, otherwise your request WILL be rejected with a 401 status code.
 
@@ -94,6 +100,11 @@ If you'd like to collaborate on this project, there are some **policies** that I
 1. **Documentation**: Currently the way this project maintains it's documentation is through the use of [swagger](https://docs.nestjs.com/openapi/introduction) in NestJS. You can find documentation regarding API calls and their responses at the `/docs` route. If you're working on a new controller or expanding on an existing one, **please** follow the guide regarding [swagger](https://docs.nestjs.com/openapi/introduction) in order to mantain a **healthy codebase** and **collaborative environment**.
 
     At the moment `/docs` is only created when `process.env.NODE_ENV !== 'production'`, so basically it only exists for developers that work on this API, it's not meant to be public.
+
+    This is how the documented API and request would look like:
+
+    ![AdminISPV1 api docs 1](./docs/apiDocs1.png)
+    ![AdminISPV1 api docs 2](./docs/apiDocs2.png)
 
     > Requests that require an API key are protected, you can authorize all requests when clicking the lock on the top right corner of `/docs` and then entering your key value.
 

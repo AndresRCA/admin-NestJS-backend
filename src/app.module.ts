@@ -37,8 +37,8 @@ import { SubModule } from './auth/entities/sub-module.entity';
     }),
     // request throttler
     ThrottlerModule.forRoot({
-      ttl: 15 * 60, // 15 minutes seconds
-      limit: 100, // 100 max requests per 15 minutes
+      ttl: 30, // 30 seconds
+      limit: 60, // 50 max requests per 30 seconds (per user)
     }),
     // load TypeORM
     TypeOrmModule.forRootAsync({
