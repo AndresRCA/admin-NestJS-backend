@@ -35,10 +35,11 @@ export class Module {
   @IsNotEmpty()
   @IsString()
   @Column({
+    type: 'varchar',
     nullable: true,
     comment: "route used in the frontend to access the module's view (if route isn't null, this module shouldn't possess any submodules)"
   })
-  route?: string;
+  route?: string | null;
   
   @Column({
     nullable: true,
