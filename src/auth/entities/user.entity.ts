@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import { IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { Module } from './module.entity';
+import { Role } from './role.entity';
 import { Session } from './session.entity';
 
 @Entity({ schema: 'auth' })
@@ -51,6 +52,12 @@ export class User {
   })
   @JoinTable()
   modules?: Module[] | null;
+
+  @ManyToMany(() => Role, {
+    cascade: true
+  })
+  @JoinTable()
+  role: Role;
 
   @Column({
     nullable: false,
