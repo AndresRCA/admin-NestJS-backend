@@ -119,11 +119,11 @@ export class AuthController {
    * @param req 
    * @returns User data for current session
    */
-   @UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request (SessionAuthGuard does all the work)
-   @Get('check-session')
-   @ApiOkResponse({ description: 'User session is active', type: Boolean })
+   //@UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request (SessionAuthGuard does all the work)
+   @Get('session/check-session')
+   @ApiOkResponse({ description: 'User session is active' })
    @ApiUnauthorizedResponse({ description: "Session is not active or not present" })
-   checkSession(): boolean {
-     return true;
+   checkSession(): string {
+    return 'session is active'
    }
 }
