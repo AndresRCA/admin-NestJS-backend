@@ -112,4 +112,18 @@ export class AuthController {
     const { session, ...result } = user; // take away the session
     return result;
   }
+
+  // work in progress SessionAuthGuard should probably not pass the user object but just check the cookie value
+  /**
+   * Check if session id is valid
+   * @param req 
+   * @returns User data for current session
+   */
+   @UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request (SessionAuthGuard does all the work)
+   @Get('check-session')
+   @ApiOkResponse({ description: 'User session is active', type: Boolean })
+   @ApiUnauthorizedResponse({ description: "Session is not active or not present" })
+   checkSession(): boolean {
+     return true;
+   }
 }
