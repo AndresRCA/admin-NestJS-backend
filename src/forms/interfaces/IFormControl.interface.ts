@@ -1,6 +1,8 @@
+import { IsString } from "class-validator";
 import { IStyleRules } from "./IStyleRules.interface";
 
-export interface IFormControl<T = any> {
+// would using a class help for documentation?
+export class IFormControl {
   name: string;
   tag?: 'input' | 'select' | 'textarea' | 'button';
   label?: string;
@@ -19,9 +21,9 @@ export interface IFormControl<T = any> {
     maxLength?: number;
     min?: number;
     max?: number;
-  },
+  };
   validators?: Array<'required' | 'requiredTrue' | 'minLength' | 'maxLength' | 'min' | 'max' | 'pattern' | 'email' | 'nullValidator' | 'compose' | 'composeAsync'>; // https://angular.io/api/forms/Validators#validators
-  data?: Array<T>; // data to fill the form control
+  data?: Array<any>; // data to fill the form control
   value?: string | boolean | null; // default value to place in the control
   order: number; // order for the control (1 would mean it's the first element in the form)
   action?: string; // method to execute (in the case of a button)

@@ -1,8 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm'
 import { IFormControl } from '../interfaces/IFormControl.interface';
 import { IStyleRules } from '../interfaces/IStyleRules.interface';
+import { FormControl } from './form-control.entity';
 import { Form } from './form.entity';
 
 @Entity({
@@ -25,13 +26,11 @@ export class FormGroup {
   @IsNotEmpty()
   @IsNumber()
   @Column({
-    nullable: false,
     type: 'int'
   })
   order: number;
 
   @Column({
-    nullable: false,
     type: 'json',
     comment: 'Json array of controls for form group'
   })
@@ -49,4 +48,7 @@ export class FormGroup {
     onDelete: "CASCADE" // when Form is removed, delete all form groups
   })
   form: Form;
+
+  @OneToMany(() => FormControl, (formControl) => formControl.formGroup, { eager: true }) // when fetching formgroups, always bring along the form controls
+  formControls: FormControl[]
 }

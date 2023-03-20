@@ -18,21 +18,17 @@ export class SubModule {
 
   @IsNotEmpty()
   @IsString()
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
   @IsNotEmpty()
   @IsNumber()
-  @Column({
-    nullable: false,
-    type: 'int'
-  })
+  @Column({ type: 'int' })
   order: number;
 
   @IsNotEmpty()
   @IsString()
   @Column({
-    nullable: false,
     comment: "route used in the frontend to access the module's view"
   })
   route: string;
@@ -45,7 +41,6 @@ export class SubModule {
   styleRules?: Pick<IStyleRules, 'icon'> | null;
 
   @Column({
-    nullable: false,
     default: true
   })
   active: boolean;
