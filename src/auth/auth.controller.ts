@@ -1,6 +1,6 @@
 import { Body, ConflictException, Controller, Get, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse, PickType } from '@nestjs/swagger';
+import { ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FastifyReply } from 'fastify';
 import { Cookies } from 'src/decorators/cookies.decorator';
@@ -106,7 +106,7 @@ export class AuthController {
   @UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request
   @Get('user-session')
   @ApiOkResponse({ description: 'User had a valid session token', type: LoginDto })
-  @ApiForbiddenResponse({ description: "Session token wasn't valid" })
+  @ApiUnauthorizedResponse({ description: "Session token wasn't valid" })
   async userSession(@Req() req: any): Promise<LoginDto> {
     const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'>; // user comes from SessionGuard
     const { session, ...result } = user; // take away the session
