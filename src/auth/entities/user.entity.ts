@@ -54,6 +54,9 @@ export class User {
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
 
+  /**
+   * List of form controls that a user is not allowed to see/use
+   */
   @ManyToMany(() => FormControl, {
     nullable: true
   })

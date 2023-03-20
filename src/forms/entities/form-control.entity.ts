@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
 import { IFormControl } from '../interfaces/IFormControl.interface';
+import { IStyleRules } from '../interfaces/IStyleRules.interface';
 import { FormGroup } from './form-group.entity';
 
 @Entity({
@@ -16,10 +17,9 @@ export class FormControl {
   @PrimaryGeneratedColumn({ type: "int" })
   id: number;
 
-  @IsNotEmpty()
   @IsString()
-  @Column()
-  name: string;
+  @Column({ nullable: true, type: 'text' })
+  description?: string | null;
 
   @IsNotEmpty()
   @IsNumber()
@@ -31,6 +31,13 @@ export class FormControl {
     comment: "Json object that defines the structure of a control (or controls that compose a FormArray's fields)"
   })
   control: IFormControl;
+
+  @Column({
+    type: 'json',
+    default: { "width": 12 },
+    comment: 'JSON object with rules that define the styling characteristics of this control (width, icon, etc)'
+  })
+  styleRules: IStyleRules;
 
   @ManyToOne(() => FormGroup, (formGroup) => formGroup.controls, {
     cascade: true, // using a single entity (FormGroup), allow operations to related tables like this one

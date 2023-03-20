@@ -37,11 +37,11 @@ export class FormGroup {
   controls: IFormControl[];
 
   @Column({
-    nullable: true,
     type: 'json',
+    default: { "width": 12 },
     comment: 'JSON object with rules that define the styling characteristics of this form'
   })
-  styleRules?: IStyleRules | null;
+  styleRules: IStyleRules;
 
   @ManyToOne(() => Form, (form) => form.formGroups, {
     cascade: true, // using a single entity (Form), allow operations to related tables like this one
