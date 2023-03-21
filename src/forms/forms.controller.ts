@@ -1,17 +1,24 @@
 import { Controller, Get, InternalServerErrorException, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { FormsService } from './forms.service';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
 import { Form } from './entities/form.entity';
 import { FormQueryDto } from './dto/form-query.dto';
 import { FormGroup } from './entities/form-group.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Cookies } from 'src/decorators/cookies.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('forms')
 @ApiSecurity('X-API-Key')
 @UseGuards(ApiKeyAuthGuard)
 @Controller('forms')
 export class FormsController {
-  constructor(private readonly formsService: FormsService) {}
+  constructor(
+    private configService: ConfigService,
+    private readonly formsService: FormsService
+  ) { }
 
   /**
    * Return forms that match the query parameters passed by the request
@@ -35,8 +42,12 @@ export class FormsController {
   @Get(':id')
   @ApiOkResponse({ description: 'Form with corresponding form groups', type: Form })
   @ApiNotFoundResponse({ description: 'No resource was found' })
-  async getForm(@Param('id') id: number): Promise<Form> {
-    const form = await this.formsService.findForm({ id });
+  @ApiUnauthorizedResponse({ description: 'If session id was provided, the authentication failed' })
+  async getForm(@Param('id') id: number, @Cookies() cookies: any): Promise<Form> {
+    const sessionToken: string | undefined = cookies[this.configService.get('SESSION_ID_NAME') as string];
+    console.log('user session token:', sessionToken);
+    const form = await this.formsService.findForm({ id }, sessionToken);
+
     if (form) return form;
     else throw new NotFoundException('The resource you were looking for could not be found');
   }

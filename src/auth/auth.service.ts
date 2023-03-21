@@ -5,11 +5,13 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Session } from './entities/session.entity';
+import { UserService } from './services/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private configService: ConfigService,
+    private userService: UserService,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Session) private sessionsRepository: Repository<Session>
   ) { }
@@ -39,6 +41,7 @@ export class AuthService {
       },
       relations: { // bring anything related to the user that might be relevant to the client
         modules: true, // dashboard modules (submodules are set to eager, so they will also come)
+        roles: true,
         session: true
       },
       order: { // order by the `order` column of `modules` and `sub_modules`
@@ -54,7 +57,7 @@ export class AuthService {
     const encryptedPassword = this.generateUserPassword(password);
     if (user && user.password === encryptedPassword) {
       const { password, ...result } = user; // result is the user object but without the password
-      return result as Pick<User, 'id' | 'username' | 'email' | 'modules'>; // return user with only these properties
+      return result as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'roles'>; // return user with only these properties
     }
 
     return null;
@@ -65,24 +68,10 @@ export class AuthService {
    * @param sessionToken 
    * @returns User
    */
-  public async validateUserSession(sessionToken: string | undefined): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules'> | null> {
+  public async validateUserSession(sessionToken: string | undefined): Promise<number | null> {
     if (!sessionToken) return null; // user doesn't even have the session id cookie (either it expired or they never had it in the first place)
-    
-    let session = await this.sessionsRepository.findOne({
-      where: { sessionToken },
-      relations: {
-        user: {
-          modules: true
-        }
-      }
-    });
-
-    if (session) {
-      const { createdAt, updatedAt, password, active, ...user } = session.user;
-      return user; // return user
-    }
-
-    return null;
+    const userId = await this.userService.findUserId({ relations: { session: { where: { sessionToken } } } });
+    return userId;
   }
 
   /**

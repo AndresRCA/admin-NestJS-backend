@@ -7,10 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { LocalStrategy } from './strategies/local.strategy';
 import { Session } from './entities/session.entity';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Session]), PassportModule],
-  providers: [AuthService, ApiKeyStrategy, LocalStrategy],
+  providers: [AuthService, UserService, ApiKeyStrategy, LocalStrategy],
   controllers: [AuthController]
 })
 export class AuthModule {}

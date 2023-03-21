@@ -7,12 +7,13 @@ import { Cookies } from 'src/decorators/cookies.decorator';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+import { PublicUserDto } from './dto/public-user.dto';
 import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { SessionAuthGuard } from './guards/session-auth.guard';
+import { UserService } from './services/user.service';
 
 @ApiTags('auth')
 @ApiSecurity('X-API-Key')
@@ -22,6 +23,7 @@ export class AuthController {
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
+    private userService: UserService,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Session) private sessionsRepository: Repository<Session>
   ) { }
@@ -56,11 +58,10 @@ export class AuthController {
    */
   @UseGuards(LocalAuthGuard) // checks for username and password in body of request
   @Post('login')
-  @ApiCreatedResponse({ description: 'User logged in without any issues and User object was returned', type: LoginDto })
+  @ApiCreatedResponse({ description: 'User logged in without any issues and User object was returned', type: PublicUserDto })
   @ApiUnauthorizedResponse({ description: 'Login attempt failed' })
-  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<LoginDto> {
-    const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'>; // user comes from LocalAuthGuard strategy
-    
+  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<PublicUserDto> {
+    const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session' | 'roles'>; // user comes from LocalAuthGuard strategy
     // if it's user first login, create a session row for them
     if (!user.session) {
       console.log('new session created');
@@ -68,6 +69,7 @@ export class AuthController {
     }
 
     const sessionToken = this.authService.generateUserSessionId();
+    console.log('new session for user:', sessionToken);
     user.session.sessionToken = sessionToken;
     await this.usersRepository.save(user);
 
@@ -94,7 +96,7 @@ export class AuthController {
     res.setCookie(
       this.configService.get('SESSION_ID_NAME') as string,
       '',
-      { maxAge: 0 }
+      { maxAge: 0 } // maxAge=0 should immediately expire the cookie when it arrives to the client
     );
   }
 
@@ -105,12 +107,12 @@ export class AuthController {
    */
   @UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request
   @Get('user-session')
-  @ApiOkResponse({ description: 'User had a valid session token', type: LoginDto })
+  @ApiOkResponse({ description: 'User had a valid session token', type: PublicUserDto })
   @ApiUnauthorizedResponse({ description: "Session token wasn't valid" })
-  async userSession(@Req() req: any): Promise<LoginDto> {
-    const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'>; // user comes from SessionGuard
-    const { session, ...result } = user; // take away the session
-    return result;
+  async userSession(@Req() req: any): Promise<PublicUserDto | null> {
+    const userId = req['userId']! as number;
+    const user = this.userService.getPublicUserInfo({ id: userId });
+    return user;
   }
 
   // work in progress SessionAuthGuard should probably not pass the user object but just check the cookie value
