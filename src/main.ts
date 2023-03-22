@@ -40,7 +40,10 @@ async function bootstrap() {
   await app.register(fastifyCookie, {
     parseOptions: {
       secure: configService.get('NODE_ENV') === 'production',
-      httpOnly: true
+      httpOnly: true,
+      signed: true,
+      domain: configService.get('DOMAIN'),
+      path: '/'
     },
     secret: configService.get('COOKIE_SECRET'), // for cookies signature
   });

@@ -44,6 +44,7 @@ export class FormsController {
   @ApiNotFoundResponse({ description: 'No resource was found' })
   @ApiUnauthorizedResponse({ description: 'If session id was provided, the authentication failed' })
   async getForm(@Param('id') id: number, @Cookies() cookies: any): Promise<Form> {
+    console.log(cookies);
     const sessionToken: string | undefined = cookies[this.configService.get('SESSION_ID_NAME') as string];
     console.log('user session token:', sessionToken);
     const form = await this.formsService.findForm({ id }, sessionToken);

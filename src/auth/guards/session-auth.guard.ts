@@ -18,10 +18,15 @@ export class SessionAuthGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const sessionId = request.cookies[this.configService.get('SESSION_ID_NAME')];
-    const userId = await this.authService.validateUserSession(sessionId);
-    
-    if (!userId) throw new UnauthorizedException(); // Session is not active or not present
+
+    let signedSessionId = request.cookies[this.configService.get('SESSION_ID_NAME')];
+    if (!signedSessionId) throw new UnauthorizedException(); // session does not exist
+
+    const sessionId = request.unsignCookie(signedSessionId);
+    if (!sessionId.valid || sessionId.value === null) throw new UnauthorizedException(); // session was tampered with
+
+    const userId = await this.authService.validateUserSession(sessionId.value);
+    if (!userId) throw new UnauthorizedException(); // session is not active or not present in database
     
     // pass userId to the request and complete validation
     request.userId = userId;

@@ -68,7 +68,7 @@ export class AuthService {
    * @param sessionToken 
    * @returns User
    */
-  public async validateUserSession(sessionToken: string | undefined): Promise<number | null> {
+  public async validateUserSession(sessionToken: string): Promise<number | null> {
     if (!sessionToken) return null; // user doesn't even have the session id cookie (either it expired or they never had it in the first place)
     const userId = await this.userService.findUserId({ relations: { session: { where: { sessionToken } } } });
     return userId;
