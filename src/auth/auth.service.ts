@@ -53,11 +53,12 @@ export class AuthService {
         }
       }
     });
+    console.log(user)
 
     const encryptedPassword = this.generateUserPassword(password);
     if (user && user.password === encryptedPassword) {
       const { password, ...result } = user; // result is the user object but without the password
-      return result as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'roles'>; // return user with only these properties
+      return result as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'roles' | 'session'>; // return user with only these properties
     }
 
     return null;

@@ -38,17 +38,15 @@ export class User {
     onDelete: "CASCADE" // when User is removed, delete session
   })
   @JoinColumn() // required decorator for OneToOne
-  session?: Session | null;
+  session: Session | null;
   /*-------------------------------------------------*/
   /*---------- MANY TO MANY RELATIONSHIPS -------------*/
   /**
    * User modules that are displayed in the dashboard
    */
-  @ManyToMany(() => Module, {
-    nullable: true
-  })
+  @ManyToMany(() => Module)
   @JoinTable({ name: 'user_modules' })
-  modules?: Module[] | null;
+  modules: Module[];
 
   @ManyToMany(() => Role)
   @JoinTable({ name: 'user_roles' })
@@ -57,11 +55,9 @@ export class User {
   /**
    * List of form controls that a user is not allowed to see/use
    */
-  @ManyToMany(() => FormControl, {
-    nullable: true
-  })
+  @ManyToMany(() => FormControl)
   @JoinTable({ name: 'user_controls_black_list' })
-  controlsBlackList?: FormControl[] | null;
+  controlsBlackList: FormControl[];
   /*---------------------------------------------------*/
 
   @IsDate()

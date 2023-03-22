@@ -1,9 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Session } from 'src/auth/entities/session.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { UserService } from 'src/auth/services/user.service';
-import { In, Not, Repository } from 'typeorm';
+import { FindManyOptions, In, Not, Repository } from 'typeorm';
 import { FormQueryDto } from './dto/form-query.dto';
 import { Form } from './entities/form.entity';
 
@@ -13,12 +12,18 @@ export class FormsService {
   constructor(
     @InjectRepository(Form) private formsRepository: Repository<Form>,
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(Session) private sessionsRepository: Repository<Session>,
     private userService: UserService
   ) { }
 
-  public findAllForms(fields?: FormQueryDto): Promise<Form[]> {
-    return this.formsRepository.find({
+  /**
+   * Retrieves all forms that meet the criteria in fields, if sessionToken is specified the result will be adjusted to the user
+   * @param fields fields to search the form with (id, name, etc).
+   * @param sessionToken session id for a user
+   * @returns forms, if sessionToken is present the returned form will be adjusted to user, if not present the returned form will unaltered
+   */
+  public async findAllForms(fields?: FormQueryDto, sessionToken?: string): Promise<Form[]> {
+    // object that represents the SQL query
+    let searchOptions: FindManyOptions<Form> = {
       where: fields,
       order: {
         formGroups: { // returns form groups ordered by their column `order`
@@ -28,30 +33,10 @@ export class FormsService {
           }
         }
       }
-    });
-  }
-
-  /**
-   * 
-   * @param fields fields to search the form with (id, name, etc).
-   * @param sessionToken session id for a user, if present returned form will be adjusted to user, if not present retu
-   * @returns forms, if sessionToken is present the returned form will be adjusted to user, if not present the returned form will unaltered
-   */
-  public async findForm(fields: FormQueryDto, sessionToken?: string): Promise<Form | null> {
-    if (!sessionToken) {
-      // if session is not specified, return form in its fullness
-      return this.formsRepository.findOne({
-        where: fields,
-        order: {
-          formGroups: { // returns form groups ordered by their column `order`
-            order: 'ASC',
-            formControls: {
-              order: 'ASC'
-            }
-          }
-        }
-      });
     }
+
+    // if session is not specified, return form in its fullness
+    if (!sessionToken) return this.formsRepository.find(searchOptions);
 
     // if session is specified, adjust form to return to user
     const userId = await this.userService.findUserId({ relations: { session: { where: { sessionToken } } } });
@@ -68,11 +53,19 @@ export class FormsService {
         }
       }
     };
-    console.log('original fields', fields);
-    fields = { ...fields, ...extraFields}; // note: be careful of field overwriting (extraFields should not have any properties the object fields can hold)
-    console.log('new fields', fields);
+    searchOptions.where = { ...fields, ...extraFields}; // note: be careful of field overwriting (extraFields should not have any properties the object fields can hold)
+    return this.formsRepository.find(searchOptions);
+  }
 
-    return this.formsRepository.findOne({
+  /**
+   * Retrieves a single form that meets the criteria in fields, if sessionToken is specified the result will be adjusted to the user
+   * @param fields fields to search the form with (id, name, etc).
+   * @param sessionToken session id for a user
+   * @returns forms, if sessionToken is present the returned form will be adjusted to user, if not present the returned form will unaltered
+   */
+  public async findForm(fields: FormQueryDto, sessionToken?: string): Promise<Form | null> {
+    // object that represents the SQL query
+    let searchOptions: FindManyOptions<Form> = {
       where: fields,
       order: {
         formGroups: { // returns form groups ordered by their column `order`
@@ -82,7 +75,28 @@ export class FormsService {
           }
         }
       }
-    });
+    }
+
+    // if session is not specified, return form in its fullness
+    if (!sessionToken) return this.formsRepository.findOne(searchOptions);
+
+    // if session is specified, adjust form to return to user
+    const userId = await this.userService.findUserId({ relations: { session: { where: { sessionToken } } } });
+    // if userId does not exist, the sessionToken must not have been valid or it was revoked by the backend
+    if (!userId) throw new UnauthorizedException();
+
+    let controlIds = await this.getUserBlackListControlIds(userId);
+    console.log('user controlIds', controlIds);
+
+    let extraFields: any = {
+      formGroups: {
+        formControls: {
+          id: Not(In(controlIds))
+        }
+      }
+    };
+    searchOptions.where = { ...fields, ...extraFields}; // note: be careful of field overwriting (extraFields should not have any properties the object fields can hold)
+    return this.formsRepository.findOne(searchOptions);
   }
 
   /**
@@ -92,8 +106,10 @@ export class FormsService {
    */
   private async getUserBlackListControlIds(userId: number): Promise<Array<number>> {
     const user = await this.usersRepository.findOne({ where: { id: userId }, relations: { controlsBlackList: true } });
+    if (!user) throw new InternalServerErrorException();
+    
     let controlIds: Array<number> = [];
-    if (user!.controlsBlackList && user!.controlsBlackList.length > 0) {
+    if (user!.controlsBlackList.length > 0) {
       // get only an array of ids for the where clause
       controlIds = user!.controlsBlackList.map((control) => control.id);
     }
