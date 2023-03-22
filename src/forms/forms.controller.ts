@@ -1,12 +1,10 @@
-import { Controller, Get, InternalServerErrorException, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, NotFoundException, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { FormsService } from './forms.service';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
 import { Form } from './entities/form.entity';
 import { FormQueryDto } from './dto/form-query.dto';
 import { FormGroup } from './entities/form-group.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Cookies } from 'src/decorators/cookies.decorator';
 import { ConfigService } from '@nestjs/config';
 
@@ -44,10 +42,9 @@ export class FormsController {
   @ApiNotFoundResponse({ description: 'No resource was found' })
   @ApiUnauthorizedResponse({ description: 'If session id was provided, the authentication failed' })
   async getForm(@Param('id') id: number, @Cookies() cookies: any): Promise<Form> {
-    console.log(cookies);
     const sessionToken: string | undefined = cookies[this.configService.get('SESSION_ID_NAME') as string];
     console.log('user session token:', sessionToken);
-    const form = await this.formsService.findForm({ id }, sessionToken);
+    const form = await this.formsService.findForm({ id }, sessionToken)
 
     if (form) return form;
     else throw new NotFoundException('The resource you were looking for could not be found');

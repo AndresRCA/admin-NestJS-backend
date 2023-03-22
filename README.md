@@ -18,9 +18,11 @@ This backend posses all sort of security measures against dangers such as DoS (D
 
 * helmet ✅
 * CORS ✅
+* Signed cookies ✅
 * Throttler ✅
 * Passport ✅
   * API Key Authorization Strategy ✅
+  * Local Authorization Strategy ✅
 * Request Body Validation ✅
   * Automatic pipe validation ✅
   * class-validator ✅
@@ -30,6 +32,16 @@ This backend posses all sort of security measures against dangers such as DoS (D
     * This is not OK: `/forms?createdAt=2015-03-23-09.41.24.684842` ❌
 
 > **IMPORTANT**: To establish a communication with some enpoints, the client MUST add to his HTTP request headers the header `X-API-Key`, the value should also be the same as the one defined in the `.env` files, otherwise your request WILL be rejected with a 401 status code.
+
+### Things to note
+
+* Signed cookies:
+  * `fastify-cookie` is used for parsing cookies.
+  * Security is set on our `main.ts` file.
+  * Cookies are signed by default.
+  * The custom `@Cookies` decorator under the `src/decorators` folder is in charge of unsigning the cookies, so you don't have to do it inside your controller.
+* Local Authorization Strategy:
+  * Refers to a Guard that handles user login attempts (checks if username and password match, that sort of thing).
 
 ## Configuration
 
