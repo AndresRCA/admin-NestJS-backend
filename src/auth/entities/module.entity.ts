@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
-import { SubModule } from './sub-module.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm'
+import { ContentBlock } from './content-block';
 
 @Entity({
   schema: 'auth',
@@ -19,7 +19,6 @@ export class Module {
   @IsNotEmpty()
   @IsString()
   @Column({
-    nullable: false,
     unique: true
   })
   name: string;
@@ -27,7 +26,6 @@ export class Module {
   @IsNotEmpty()
   @IsNumber()
   @Column({
-    nullable: false,
     type: 'int'
   })
   order: number;
@@ -37,23 +35,33 @@ export class Module {
   @Column({
     type: 'varchar',
     nullable: true,
-    comment: "route used in the frontend to access the module's view (if route isn't null, this module shouldn't possess any submodules)"
+    comment: "route used in the frontend to access the module's view data (if route isn't null, this module shouldn't possess any submodules)"
   })
-  route?: string | null;
+  action: string | null;
   
   @Column({
-    nullable: true,
     type: 'json',
-    comment: 'JSON object with rules that define the styling characteristics of the module (like the icon that accompanies the name)'
+    nullable: true,
+    comment: 'JSON object with rules that define the styling characteristics of the module (like the icon that accompanies the name in the menu)'
   })
-  styleRules?: Pick<IStyleRules, 'icon'>;
+  styleRules: Pick<IStyleRules, 'icon'> | null;
 
   @Column({
-    nullable: false,
     default: true
   })
   active: boolean
 
-  @OneToMany(() => SubModule, (subModule) => subModule.module, { eager: true }) // when fetching modules, always bring along the sub-modules
-  subModules: SubModule[]
+  /**
+   * Blocks of content that compose a module's view, they can be forms, buttons, tables, etc.
+   */
+  @OneToMany(() => ContentBlock, contentBlock => contentBlock.module)
+  contentBlocks: ContentBlock[];
+
+  /*----- SELF REFERENCING RELATIONSHIP -----*/
+  @ManyToOne(() => Module, module => module.childrenModules)
+  parentModule: Module;
+
+  @OneToMany(() => Module, module => module.parentModule, { eager: true })
+  childrenModules: Module[];
+  /*-----------------------------------------*/
 }

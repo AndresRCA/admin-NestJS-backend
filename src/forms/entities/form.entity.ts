@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { ContentBlock } from 'src/auth/entities/content-block';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
 import { FormGroup } from './form-group.entity';
 
@@ -20,4 +21,10 @@ export class Form {
 
   @OneToMany(() => FormGroup, (formGroup) => formGroup.form, { eager: true }) // when fetching forms, always bring along the form groups
   formGroups: FormGroup[]
+
+  /**
+   * A form can belong to many content blocks
+   */
+  @OneToMany(() => ContentBlock, (contentBlock) => contentBlock.form)
+  contentBlocks: ContentBlock[]
 }

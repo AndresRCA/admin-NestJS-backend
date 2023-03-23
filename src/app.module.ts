@@ -17,9 +17,9 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { User } from './auth/entities/user.entity';
 import { Session } from './auth/entities/session.entity';
 import { Module as UserModule } from './auth/entities/module.entity';
-import { SubModule } from './auth/entities/sub-module.entity';
 import { Role } from './auth/entities/role.entity';
 import { FormControl } from './forms/entities/form-control.entity';
+import { ContentBlock } from './auth/entities/content-block';
 
 @Module({
   imports: [
@@ -59,7 +59,7 @@ import { FormControl } from './forms/entities/form-control.entity';
           User,
           Session,
           UserModule,
-          SubModule,
+          ContentBlock,
           Role
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
