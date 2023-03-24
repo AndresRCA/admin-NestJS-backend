@@ -1,4 +1,4 @@
-import { Controller, Get, InternalServerErrorException, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, NotFoundException, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ApiKeyAuthGuard } from 'src/auth/guards/api-key-auth.guard';
 import { Form } from './entities/form.entity';
@@ -7,6 +7,8 @@ import { FormGroup } from './entities/form-group.entity';
 import { Cookies } from 'src/decorators/cookies.decorator';
 import { ConfigService } from '@nestjs/config';
 import { DynamicContentService } from './dynamic-content.service';
+import { SessionAuthGuard } from 'src/auth/guards/session-auth.guard';
+import { FastifyRequest } from 'fastify';
 
 
 @ApiTags('dynamic-content')
@@ -45,11 +47,6 @@ export class DynamicContentController {
   async getForm(@Param('id') id: number, @Cookies() cookies: any): Promise<Form> {
     const sessionToken: string | undefined = cookies[this.configService.get('SESSION_ID_NAME') as string];
     console.log('user session token:', sessionToken);
-    // try {
-    //   await this.dynamicContentService.findForm({ id }, sessionToken)
-    // } catch (error) {
-    //   console.log(error)
-    // }
     const form = await this.dynamicContentService.findForm({ id }, sessionToken)
 
     if (form) return form;
@@ -123,5 +120,15 @@ export class DynamicContentController {
     }
     
     return registerClientForm;
+  }
+
+  @UseGuards(SessionAuthGuard)
+  @Get('module/:moduleId/content-block')
+  @ApiOkResponse({ description: 'Form and form groups with data included for client registration', type: Form })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error, there was an issue with the code' })
+  async fetchModuleContent(@Req() req: FastifyRequest & { userId: number }, @Param('moduleId') moduleId: number): Promise<void> {
+    const userId: number = req.userId; // come from the SessionAuthGuard
+    let userModuleContent = await this.dynamicContentService.findModuleContent({ id: moduleId }, userId);
+    console.log('user module content', userModuleContent);
   }
 }

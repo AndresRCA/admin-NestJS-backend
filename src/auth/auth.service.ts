@@ -72,6 +72,9 @@ export class AuthService {
     return userId;
   }
 
+  public async logoutUser(userId: number): Promise<void> {
+    // using the userId update the sessionToken value to null
+  }
   /**
    * Generate an encrypted password to store into the database
    * @param password 

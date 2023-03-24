@@ -65,7 +65,6 @@ import { ActionButton } from './dynamic-content/entities/action-button.entity';
           Role
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
-        migrations: ['../migrations/*{.ts,.js}'],
         namingStrategy: new SnakeNamingStrategy()
       }),
       inject: [ConfigService],

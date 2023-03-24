@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserQueryDto } from 'src/auth/dto/user-query.dto';
 import { User } from 'src/auth/entities/user.entity';
@@ -52,5 +52,23 @@ export class UserService {
         }
       }
     });
+  }
+
+  /**
+   * Get list of ids of controls the user should not have access to.
+   * @param userId id to identify user
+   * @returns array of ids (FK) that belong to form controls
+   */
+  public async getUserBlackListControlIds(userId: number): Promise<Array<number>> {
+    const user = await this.usersRepository.findOne({ where: { id: userId }, relations: { controlsBlackList: true } });
+    if (!user) throw new InternalServerErrorException();
+    
+    let controlIds: Array<number> = [];
+    if (user!.controlsBlackList.length > 0) {
+      // get only an array of ids for the where clause
+      controlIds = user!.controlsBlackList.map((control) => control.id);
+    }
+
+    return controlIds;
   }
 }

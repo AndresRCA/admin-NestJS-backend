@@ -8,10 +8,12 @@ import { Form } from './entities/form.entity';
 import { Session } from 'src/auth/entities/session.entity';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/auth/services/user.service';
+import { ContentBlock } from './entities/content-block.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Form, FormGroup, Session, User])],
+  imports: [TypeOrmModule.forFeature([Form, FormGroup, Session, User, ContentBlock])],
   controllers: [DynamicContentController],
-  providers: [DynamicContentService, ConfigService, UserService]
+  providers: [DynamicContentService, ConfigService, UserService, AuthService]
 })
 export class DynamicContentModule {}

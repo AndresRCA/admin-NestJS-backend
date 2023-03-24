@@ -9,7 +9,7 @@ export enum ContentBlockType {
   FORM = 'form',
   ACTION_BUTTONS = 'action buttons',
   TABLE = 'table',
-  FILTER = 'filter'
+  FILTER_FORM = 'filter form'
 }
 
 @Entity({
@@ -44,11 +44,11 @@ export class ContentBlock {
   })
   type: ContentBlockType;
 
-  @ManyToMany(() => Form)
+  @ManyToMany(() => Form, { eager: true })
   @JoinTable({ name: 'content_block_forms' })
   form: Form[];
   
-  @ManyToMany(() => ActionButton)
+  @ManyToMany(() => ActionButton, { eager: true })
   @JoinTable({ name: 'content_block_action_buttons' })
   actionsButtons: ActionButton[];
 

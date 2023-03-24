@@ -1,9 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { Module } from 'src/auth/entities/module.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 import { IStyleRules } from '../interfaces/IStyleRules.interface';
-import { ContentBlock } from './content-block.entity';
 
 @Entity({
   schema: 'dynamic_content',
@@ -49,10 +47,4 @@ export class ActionButton {
     comment: "Json object that defines the structure of an element"
   })
   element: Object;
-
-  @ManyToOne(() => ContentBlock, contentBlock => contentBlock.actionsButtons, {
-    cascade: true, // using a single entity (Module), allow operations to related tables like this one
-    onDelete: "CASCADE" // when Module is removed, delete all ContentBlock related to it
-  })
-  contentBlock: Module;
 }
