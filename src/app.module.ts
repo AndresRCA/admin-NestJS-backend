@@ -9,17 +9,18 @@ import databaseConfig from './config/database.config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
-import { FormsModule } from './forms/forms.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FormGroup } from './forms/entities/form-group.entity';
-import { Form } from './forms/entities/form.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { User } from './auth/entities/user.entity';
 import { Session } from './auth/entities/session.entity';
 import { Module as UserModule } from './auth/entities/module.entity';
 import { Role } from './auth/entities/role.entity';
-import { FormControl } from './forms/entities/form-control.entity';
-import { ContentBlock } from './auth/entities/content-block';
+import { DynamicContentModule } from './dynamic-content/dynamic-content.module';
+import { ContentBlock } from './dynamic-content/entities/content-block.entity';
+import { FormControl } from './dynamic-content/entities/form-control.entity';
+import { FormGroup } from './dynamic-content/entities/form-group.entity';
+import { Form } from './dynamic-content/entities/form.entity';
+import { ActionButton } from './dynamic-content/entities/action-button.entity';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ContentBlock } from './auth/entities/content-block';
           Session,
           UserModule,
           ContentBlock,
+          ActionButton,
           Role
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
@@ -69,7 +71,7 @@ import { ContentBlock } from './auth/entities/content-block';
       inject: [ConfigService],
     }),
     AuthModule,
-    FormsModule,
+    DynamicContentModule,
   ],
   controllers: [AppController],
   providers: [

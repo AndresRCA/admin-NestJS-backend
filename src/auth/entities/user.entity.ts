@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { FormControl } from 'src/forms/entities/form-control.entity';
+import { FormControl } from 'src/dynamic-content/entities/form-control.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { Module } from './module.entity';
 import { Role } from './role.entity';

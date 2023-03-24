@@ -7,4 +7,4 @@ import { Form } from "../entities/form.entity";
  * /forms?name=consulta -> HTTP 200
  * /forms?formGroups=2 -> HTTP 404
  */
-export class FormQueryDto extends PartialType(OmitType(Form, ['formGroups'] as const)) {}
+export class FormQueryDto extends PartialType(OmitType(Form, ['formGroups' ,'contentBlocks'] as const)) {}

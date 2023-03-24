@@ -46,10 +46,7 @@ export class AuthService {
       },
       order: { // order by the `order` column of `modules` and `sub_modules`
         modules: {
-          order: "ASC",
-          subModules: {
-            order: "ASC"
-          }
+          order: "ASC"
         }
       }
     });

@@ -1,9 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { Form } from 'src/forms/entities/form.entity';
-import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm'
-import { Module } from './module.entity';
+import { Module } from 'src/auth/entities/module.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm'
+import { ActionButton } from './action-button.entity';
+import { Form } from './form.entity';
 
 export enum ContentBlockType {
   FORM = 'form',
@@ -13,7 +13,7 @@ export enum ContentBlockType {
 }
 
 @Entity({
-  schema: 'auth',
+  schema: 'dynamic_content',
   orderBy: { // returns modules ordered by their column `order`
     order: "ASC"
   }
@@ -44,27 +44,15 @@ export class ContentBlock {
   })
   type: ContentBlockType;
 
-  @Column({
-    type: 'varchar',
-    nullable: true,
-    comment: "route used in the frontend to access the module's view data (if route isn't null, this module shouldn't possess any submodules)"
-  })
-  action: string | null;
+  @ManyToMany(() => Form)
+  @JoinTable({ name: 'content_block_forms' })
+  form: Form[];
   
-  @Column({
-    type: 'json',
-    nullable: true,
-    comment: 'JSON object with rules that define the styling characteristics of the content block (like the icon that accompanies the title)'
-  })
-  styleRules: Pick<IStyleRules, 'icon'> | null;
+  @ManyToMany(() => ActionButton)
+  @JoinTable({ name: 'content_block_action_buttons' })
+  actionsButtons: ActionButton[];
 
-  @ManyToOne(() => Form, (form) => form.contentBlocks)
-  form: Form;
-  
-  @ManyToOne(() => Form, (form) => form.contentBlocks)
-  actionsButtons: Form;
-
-  @ManyToOne(() => Module, module => module.childrenModules, {
+  @ManyToOne(() => Module, module => module.contentBlocks, {
     cascade: true, // using a single entity (Module), allow operations to related tables like this one
     onDelete: "CASCADE" // when Module is removed, delete all ContentBlock related to it
   })

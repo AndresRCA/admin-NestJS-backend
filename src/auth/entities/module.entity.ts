@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm'
-import { ContentBlock } from './content-block';
+import { ContentBlock } from 'src/dynamic-content/entities/content-block.entity';
+import { IStyleRules } from 'src/dynamic-content/interfaces/IStyleRules.interface';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
 
 @Entity({
   schema: 'auth',

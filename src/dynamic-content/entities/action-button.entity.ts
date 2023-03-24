@@ -1,19 +1,12 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber } from 'class-validator';
-import { Form } from 'src/forms/entities/form.entity';
-import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm'
-import { Module } from './module.entity';
-
-export enum ContentBlockType {
-  FORM = 'form',
-  ACTION_BUTTONS = 'action buttons',
-  TABLE = 'table',
-  FILTER = 'filter'
-}
+import { Module } from 'src/auth/entities/module.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { IStyleRules } from '../interfaces/IStyleRules.interface';
+import { ContentBlock } from './content-block.entity';
 
 @Entity({
-  schema: 'auth',
+  schema: 'dynamic_content',
   orderBy: { // returns modules ordered by their column `order`
     order: "ASC"
   }
@@ -38,16 +31,9 @@ export class ActionButton {
   order: number;
 
   @Column({
-    type: 'enum',
-    enum: ContentBlockType,
-    comment: "defines the format that should be used in the client"
-  })
-  type: ContentBlockType;
-
-  @Column({
     type: 'varchar',
     nullable: true,
-    comment: "route used in the frontend to access the module's view data (if route isn't null, this module shouldn't possess any submodules)"
+    comment: "function that should be called in the client"
   })
   action: string | null;
   
@@ -58,15 +44,15 @@ export class ActionButton {
   })
   styleRules: Pick<IStyleRules, 'icon'> | null;
 
-  @ManyToOne(() => Form, (form) => form.contentBlocks)
-  form: Form;
-  
-  @ManyToOne(() => Form, (form) => form.contentBlocks)
-  actionsButtons: Form;
+  @Column({
+    type: 'json',
+    comment: "Json object that defines the structure of an element"
+  })
+  element: Object;
 
-  @ManyToOne(() => Module, module => module.childrenModules, {
+  @ManyToOne(() => ContentBlock, contentBlock => contentBlock.actionsButtons, {
     cascade: true, // using a single entity (Module), allow operations to related tables like this one
     onDelete: "CASCADE" // when Module is removed, delete all ContentBlock related to it
   })
-  module: Module;
+  contentBlock: Module;
 }

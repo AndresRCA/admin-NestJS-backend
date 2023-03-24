@@ -7,8 +7,7 @@ import { FormQueryDto } from './dto/form-query.dto';
 import { Form } from './entities/form.entity';
 
 @Injectable()
-export class FormsService {
-
+export class DynamicContentService {
   constructor(
     @InjectRepository(Form) private formsRepository: Repository<Form>,
     @InjectRepository(User) private usersRepository: Repository<User>,

@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { ContentBlock } from 'src/auth/entities/content-block';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { ContentBlock } from './content-block.entity';
 import { FormGroup } from './form-group.entity';
 
 @Entity({ schema: 'forms' })
