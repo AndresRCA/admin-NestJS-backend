@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { ActionButton } from 'src/dynamic-content/entities/action-button.entity';
 import { FormControl } from 'src/dynamic-content/entities/form-control.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { Module } from './module.entity';
@@ -58,6 +59,13 @@ export class User {
   @ManyToMany(() => FormControl)
   @JoinTable({ name: 'user_controls_black_list' })
   controlsBlackList: FormControl[];
+
+  /**
+   * List of action buttons that a user is not allowed to see/use
+   */
+   @ManyToMany(() => ActionButton)
+   @JoinTable({ name: 'user_action_buttons_black_list' })
+   actionButtonsBlackList: ActionButton[];
   /*---------------------------------------------------*/
 
   @IsDate()

@@ -1,7 +1,5 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Module } from 'src/auth/entities/module.entity';
-import { User } from 'src/auth/entities/user.entity';
 import { UserService } from 'src/auth/services/user.service';
 import { FindManyOptions, In, Not, Repository } from 'typeorm';
 import { FormQueryDto } from './dto/form-query.dto';
@@ -14,7 +12,6 @@ export class DynamicContentService {
   constructor(
     @InjectRepository(ContentBlock) private contentBlockRepository: Repository<ContentBlock>,
     @InjectRepository(Form) private formsRepository: Repository<Form>,
-    @InjectRepository(User) private usersRepository: Repository<User>,
     private userService: UserService
   ) { }
 
@@ -115,12 +112,50 @@ export class DynamicContentService {
      */
     let controlIds = await this.userService.getUserBlackListControlIds(userId);
     console.log('user controlIds', controlIds);
+    let buttonIds = await this.userService.getUserBlackListActionButtonsIds(userId)
+    console.log('user buttonIds', buttonIds);
 
-    // fetch the content tailored to this user
+    let queryBuilder = this.contentBlockRepository.createQueryBuilder('contentBlock')
+      .leftJoinAndSelect('contentBlock.forms', 'forms')
+      .leftJoinAndSelect('forms.formGroups', 'formGroups')
+      .where('contentBlock.module_id = :moduleId', { moduleId: moduleFields.id })
+      .orderBy('contentBlock.order', 'ASC');
+
+    if (controlIds.length > 0) {
+      queryBuilder.leftJoinAndSelect('formGroups.formControls', 'formControls', 'formControls.id NOT IN (:...controlIds)', { controlIds });
+    } else {
+      queryBuilder.leftJoinAndSelect('formGroups.formControls', 'formControls');
+    }
+
+    if (buttonIds.length > 0) {
+      queryBuilder.leftJoinAndSelect('contentBlock.actionButtons', 'actionButtons', 'actionButtons.id NOT IN (:...buttonIds)', { buttonIds });
+    } else {
+      queryBuilder.leftJoinAndSelect('contentBlock.actionButtons', 'actionButtons');
+    }
+
+    return queryBuilder.getMany();
+    
+    /* this is not working as intended... */
     return this.contentBlockRepository.find({
-      where: { module: moduleFields },
+      where: {
+        module: {
+          ...moduleFields,
+          contentBlocks: {
+            forms: {
+              formGroups: {
+                formControls: {
+                  id: Not(In(controlIds)) // this is not working
+                }
+              }
+            },
+            actionButtons: {
+              id: Not(In(buttonIds))
+            }
+          }
+        }
+      },
       order: { order: 'ASC' }
-    })
+    });
   }
 
   /**

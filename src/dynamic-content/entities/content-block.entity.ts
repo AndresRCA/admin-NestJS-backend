@@ -46,11 +46,11 @@ export class ContentBlock {
 
   @ManyToMany(() => Form, { eager: true })
   @JoinTable({ name: 'content_block_forms' })
-  form: Form[];
+  forms: Form[];
   
   @ManyToMany(() => ActionButton, { eager: true })
   @JoinTable({ name: 'content_block_action_buttons' })
-  actionsButtons: ActionButton[];
+  actionButtons: ActionButton[];
 
   @ManyToOne(() => Module, module => module.contentBlocks, {
     cascade: true, // using a single entity (Module), allow operations to related tables like this one

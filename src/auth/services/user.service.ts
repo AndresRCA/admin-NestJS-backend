@@ -71,4 +71,17 @@ export class UserService {
 
     return controlIds;
   }
+
+  public async getUserBlackListActionButtonsIds(userId: number): Promise<Array<number>> {
+    const user = await this.usersRepository.findOne({ where: { id: userId }, relations: { actionButtonsBlackList: true } });
+    if (!user) throw new InternalServerErrorException();
+    
+    let buttonIds: Array<number> = [];
+    if (user!.actionButtonsBlackList.length > 0) {
+      // get only an array of ids for the where clause
+      buttonIds = user!.actionButtonsBlackList.map((button) => button.id);
+    }
+
+    return buttonIds;
+  }
 }

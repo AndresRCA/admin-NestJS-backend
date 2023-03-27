@@ -5,7 +5,7 @@ import { IStyleRules } from '../interfaces/IStyleRules.interface';
 
 @Entity({
   schema: 'dynamic_content',
-  orderBy: { // returns modules ordered by their column `order`
+  orderBy: {
     order: "ASC"
   }
 })
