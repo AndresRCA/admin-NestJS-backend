@@ -78,7 +78,7 @@ export class DynamicContentController {
   @Get('forms/abonado-registro')
   @ApiOkResponse({ description: 'Form and form groups with data included for client registration', type: Form })
   @ApiInternalServerErrorResponse({ description: 'Internal server error, there was an issue with the code' })
-  async abonadoRegistroForm(): Promise<Form> {
+  async abonadoRegistroForm() {
     let registerClientForm = await this.dynamicContentService.findForm({ name: 'registro abonado' });
     if (registerClientForm === null) throw new InternalServerErrorException('Internal server error', { description: "Couldn't find a form" })
 
@@ -104,26 +104,11 @@ export class DynamicContentController {
           break;
       }
       if(!formGroupData) continue;
-
-      // append the data to our form controls that came from the json
-      for (let control of formGroup.controls) {
-        if (control.is_form_array) {
-          for (let groupControl of control.form_array_controls!) {
-            if (groupControl.data !== undefined) {
-              groupControl.data = formGroupData[groupControl.name];
-            }
-          }
-        } else if (control.data !== undefined) {
-          control.data = formGroupData[control.name];
-        }
-      }
     }
-    
-    return registerClientForm;
   }
 
   @UseGuards(SessionAuthGuard)
-  @Get('module/:moduleId/content-block')
+  @Get('modules/:moduleId/content-blocks')
   @ApiOkResponse({ description: 'Form and form groups with data included for client registration', type: Form })
   @ApiInternalServerErrorResponse({ description: 'Internal server error, there was an issue with the code' })
   async fetchModuleContent(@Req() req: FastifyRequest & { userId: number }, @Param('moduleId') moduleId: number): Promise<void> {
