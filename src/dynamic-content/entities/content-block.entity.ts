@@ -3,6 +3,7 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 import { Module } from 'src/auth/entities/module.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm'
 import { ActionButton } from './action-button.entity';
+import { FormFilter } from './form-filter.entity';
 import { Form } from './form.entity';
 
 export enum ContentBlockType {
@@ -51,6 +52,10 @@ export class ContentBlock {
   @ManyToMany(() => ActionButton, { eager: true })
   @JoinTable({ name: 'content_block_action_buttons' })
   actionButtons: ActionButton[];
+
+  @ManyToMany(() => FormFilter, { eager: true })
+  @JoinTable({ name: 'content_block_form_filters' })
+  formFilters: FormFilter[];
 
   @ManyToOne(() => Module, module => module.contentBlocks, {
     cascade: true, // using a single entity (Module), allow operations to related tables like this one

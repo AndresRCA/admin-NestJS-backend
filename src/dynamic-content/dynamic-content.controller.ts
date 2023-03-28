@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { DynamicContentService } from './dynamic-content.service';
 import { SessionAuthGuard } from 'src/auth/guards/session-auth.guard';
 import { FastifyRequest } from 'fastify';
+import { FormFilterService } from './services/form-filter/form-filter.service';
 
 
 @ApiTags('dynamic-content')
@@ -17,8 +18,9 @@ import { FastifyRequest } from 'fastify';
 @Controller()
 export class DynamicContentController {
   constructor(
-    private configService: ConfigService,
-    private readonly dynamicContentService: DynamicContentService
+    private readonly configService: ConfigService,
+    private readonly dynamicContentService: DynamicContentService,
+    private readonly formFilterService: FormFilterService
   ) { }
 
   /**
@@ -115,5 +117,10 @@ export class DynamicContentController {
     const userId: number = req.userId; // come from the SessionAuthGuard
     let userModuleContent = await this.dynamicContentService.findModuleContent({ id: moduleId }, userId);
     console.log('user module content', userModuleContent);
+  }
+
+  @Get('test')
+  async test(): Promise<void> {
+    await this.formFilterService.findFormFilterFormat('getFacturacionFilters');
   }
 }

@@ -21,6 +21,7 @@ import { FormControl } from './dynamic-content/entities/form-control.entity';
 import { FormGroup } from './dynamic-content/entities/form-group.entity';
 import { Form } from './dynamic-content/entities/form.entity';
 import { ActionButton } from './dynamic-content/entities/action-button.entity';
+import { FormFilter } from './dynamic-content/entities/form-filter.entity';
 
 @Module({
   imports: [
@@ -58,11 +59,12 @@ import { ActionButton } from './dynamic-content/entities/action-button.entity';
           FormGroup,
           FormControl,
           User,
+          Role,
           Session,
           UserModule,
           ContentBlock,
-          ActionButton,
-          Role
+          FormFilter,
+          ActionButton
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
         namingStrategy: new SnakeNamingStrategy()
