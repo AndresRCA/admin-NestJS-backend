@@ -1,4 +1,3 @@
-import { IsString } from "class-validator";
 import { IStyleRules } from "./IStyleRules.interface";
 
 // would using a class help for documentation?

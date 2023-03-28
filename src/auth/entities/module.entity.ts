@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ContentBlock } from 'src/dynamic-content/entities/content-block.entity';
 import { IStyleRules } from 'src/dynamic-content/interfaces/IStyleRules.interface';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
@@ -30,14 +30,21 @@ export class Module {
   })
   order: number;
 
-  @IsNotEmpty()
   @IsString()
   @Column({
     type: 'varchar',
     nullable: true,
-    comment: "route used in the frontend to access the module's view data (if route isn't null, this module shouldn't possess any submodules)"
+    comment: "route used for building a router in the frontend. Value should be null if module has children and acts as a dropdown menu"
   })
-  action: string | null;
+  route: string | null;
+
+  @IsString()
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    comment: "API route used in the frontend to access the module's view data. Value should be null if module has children and acts as a dropdown menu"
+  })
+  contentRoute: string | null;
   
   @Column({
     type: 'json',
@@ -46,6 +53,7 @@ export class Module {
   })
   styleRules: Pick<IStyleRules, 'icon'> | null;
 
+  @IsBoolean()
   @Column({
     default: true
   })
@@ -59,7 +67,7 @@ export class Module {
 
   /*----- SELF REFERENCING RELATIONSHIP -----*/
   @ManyToOne(() => Module, module => module.childrenModules)
-  parentModule: Module;
+  parentModule: Module | null;
 
   @OneToMany(() => Module, module => module.parentModule, { eager: true })
   childrenModules: Module[];

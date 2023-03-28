@@ -10,6 +10,7 @@ import { DynamicContentService } from './dynamic-content.service';
 import { SessionAuthGuard } from 'src/auth/guards/session-auth.guard';
 import { FastifyRequest } from 'fastify';
 import { FormFilterService } from './services/form-filter/form-filter.service';
+import { ContentBlock } from './entities/content-block.entity';
 
 
 @ApiTags('dynamic-content')
@@ -111,12 +112,13 @@ export class DynamicContentController {
 
   @UseGuards(SessionAuthGuard)
   @Get('modules/:moduleId/content-blocks')
-  @ApiOkResponse({ description: 'Form and form groups with data included for client registration', type: Form })
+  @ApiOkResponse({ description: 'Form and form groups with data included for client registration', type: ContentBlock })
   @ApiInternalServerErrorResponse({ description: 'Internal server error, there was an issue with the code' })
-  async fetchModuleContent(@Req() req: FastifyRequest & { userId: number }, @Param('moduleId') moduleId: number): Promise<void> {
+  async fetchModuleContent(@Req() req: FastifyRequest & { userId: number }, @Param('moduleId') moduleId: number): Promise<ContentBlock[]> {
     const userId: number = req.userId; // come from the SessionAuthGuard
     let userModuleContent = await this.dynamicContentService.findModuleContent({ id: moduleId }, userId);
     console.log('user module content', userModuleContent);
+    return userModuleContent;
   }
 
   @Get('test')
