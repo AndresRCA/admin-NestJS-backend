@@ -22,6 +22,9 @@ import { FormGroup } from './dynamic-content/entities/form-group.entity';
 import { Form } from './dynamic-content/entities/form.entity';
 import { ActionButton } from './dynamic-content/entities/action-button.entity';
 import { FormFilter } from './dynamic-content/entities/form-filter.entity';
+import { DbfullClientService } from './services/dbfull-client/dbfull-client.service';
+import { EncryptionService } from './services/encryption/encryption.service';
+import dbfullDatabaseConfig from './config/dbfull-database.config';
 
 @Module({
   imports: [
@@ -32,7 +35,8 @@ import { FormFilter } from './dynamic-content/entities/form-filter.entity';
       cache: true, // increase the performance of ConfigService#get method when it comes to variables stored in process.env
       load: [ // .config.ts files define properties based on process.env variables and converts strings to other types if needed, or adds default values
         httpConfig,
-        databaseConfig
+        databaseConfig,
+        dbfullDatabaseConfig
       ],
     }),
     // index.html serving
@@ -80,7 +84,9 @@ import { FormFilter } from './dynamic-content/entities/form-filter.entity';
       provide: APP_GUARD,
       useClass: ThrottlerGuard, // by setting up this provider, ThrottlerGuard is now used globally
     },
-    AppService
+    AppService,
+    DbfullClientService,
+    EncryptionService
   ],
 })
 export class AppModule {}
