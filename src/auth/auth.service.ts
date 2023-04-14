@@ -34,22 +34,33 @@ export class AuthService {
    * @returns returns user if it exists, null otherwise
    */
   public async validateUser(username: string, password: string): Promise<Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session'> | null> {
-    const user = await this.usersRepository.findOne({
-      select: ['id', 'username', 'password', 'email'],
-      where: {
-        username
-      },
-      relations: { // bring anything related to the user that might be relevant to the client
-        modules: true, // dashboard modules (submodules are set to eager, so they will also come)
-        roles: true,
-        session: true
-      },
-      order: { // order by the `order` column of `modules` and `sub_modules`
-        modules: {
-          order: "ASC"
-        }
-      }
-    });
+    // const user = await this.usersRepository.findOne({
+    //   select: ['id', 'username', 'password', 'email'],
+    //   where: {
+    //     username
+    //   },
+    //   relations: { // bring anything related to the user that might be relevant to the client
+    //     modules: true, // dashboard modules (submodules are set to eager, so they will also come)
+    //     roles: true,
+    //     session: true
+    //   },
+    //   order: { // order by the `order` column of `modules` and `sub_modules`
+    //     modules: {
+    //       order: "ASC"
+    //     }
+    //   }
+    // });
+    const user = await this.usersRepository
+  .createQueryBuilder('user')
+  .leftJoinAndSelect('user.modules', 'module') // join parent modules
+  .leftJoinAndSelect('module.childrenModules', 'child') // join child modules
+  .leftJoinAndSelect('user.roles', 'role')
+  .leftJoinAndSelect('user.session', 'session')
+  .where('user.username = :username', { username })
+  .orderBy('module.order', 'ASC')
+  .addOrderBy('child.order', 'ASC')
+  .select(['user.id', 'user.username', 'user.password', 'user.email', 'module', 'child', 'module.parentModule'])
+  .getOne();
     console.log(user)
 
     const encryptedPassword = this.generateUserPassword(password);

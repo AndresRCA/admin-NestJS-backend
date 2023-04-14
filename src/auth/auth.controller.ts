@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
 import { PublicUserDto } from './dto/public-user.dto';
+import { Module } from './entities/module.entity';
 import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
@@ -25,7 +26,8 @@ export class AuthController {
     private authService: AuthService,
     private userService: UserService,
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(Session) private sessionsRepository: Repository<Session>
+    @InjectRepository(Session) private sessionsRepository: Repository<Session>,
+    @InjectRepository(Module) private modulesRepository: Repository<Module>
   ) { }
   
   /**
@@ -136,5 +138,11 @@ export class AuthController {
    @ApiUnauthorizedResponse({ description: "Session is not active or not present" })
    checkSession(): string {
     return 'session is active'
+   }
+
+   @Get('test')
+   async test() {
+    let r = await this.modulesRepository.find();
+    console.log(r)
    }
 }
