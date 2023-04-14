@@ -25,6 +25,7 @@ import { FormFilter } from './dynamic-content/entities/form-filter.entity';
 import { DbfullClientService } from './services/dbfull-client/dbfull-client.service';
 import { EncryptionService } from './services/encryption/encryption.service';
 import dbfullDatabaseConfig from './config/dbfull-database.config';
+import { Table } from './dynamic-content/entities/table.entity';
 
 @Module({
   imports: [
@@ -68,7 +69,8 @@ import dbfullDatabaseConfig from './config/dbfull-database.config';
           UserModule,
           ContentBlock,
           FormFilter,
-          ActionButton
+          ActionButton,
+          Table
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
         namingStrategy: new SnakeNamingStrategy()

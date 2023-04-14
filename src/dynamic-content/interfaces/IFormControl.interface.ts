@@ -1,30 +1,60 @@
-import { IStyleRules } from "./IStyleRules.interface";
-
 // would using a class help for documentation?
-export class IFormControl {
+export class IFormControl<T = any> {
   name: string;
   tag?: 'input' | 'select' | 'textarea' | 'button';
   label?: string;
-  content?: string; // the text to show inside a button when tag is 'button'
-  style_rules?: IStyleRules;
-  form_array_controls?: Array<IFormControl>; // this array of controls refers to what gets asked again in a form (could be only one control, or more)
-  is_form_array?: true;
+  /**
+   * the text to show inside a button when tag is 'button'
+   */
+  content?: string;
   attributes?: {
     type?: 'text' | 'radio' | 'checkbox' | 'number' | 'tel' | 'date' | 'email' | 'url' | 'search' | 'password';
     placeholder?: string;
-    pattern?: string; // regex
+    /**
+     * regex pattern as a string
+     */
+    pattern?: '[0-9]*' | '[0-9]{3}-[0-9]{7}';
     required?: true;
     disabled?: true;
-    value?: string | number | boolean; // the default value of for example an input
+    /**
+     * the default value to place in a control, for example an input that's already filled out
+     */
+    value?: string | number | boolean | Object;
     minLength?: number;
     maxLength?: number;
     min?: number;
     max?: number;
   };
-  validators?: Array<'required' | 'requiredTrue' | 'minLength' | 'maxLength' | 'min' | 'max' | 'pattern' | 'email' | 'nullValidator' | 'compose' | 'composeAsync'>; // https://angular.io/api/forms/Validators#validators
-  data?: Array<any>; // data to fill the form control
-  value?: string | boolean | null; // default value to place in the control
-  order: number; // order for the control (1 would mean it's the first element in the form)
-  action?: string; // method to execute (in the case of a button)
-  fills?: string // must be the name of a form control (this is for external controls that execute actions and fill another control)
+  /**
+   * refers to these validators: https://angular.io/api/forms/Validators#validators
+   */
+  validators?: Array<'required' | 'requiredTrue' | 'minLength' | 'maxLength' | 'min' | 'max' | 'pattern' | 'email' | 'nullValidator' | 'compose' | 'composeAsync'>;
+  /**
+   * data to fill the form control
+   */
+  data?: Array<T>;
+  /**
+   * method to execute (in the case of a button)
+   */
+  action?: string;
+  /**
+   * must be the name of a form control (this is for external controls that execute actions and fill another control)
+   */
+  fills?: string;
+  /**
+   * the name of the group the control belongs to.
+   * For an example see: REPORTES / REPORTE DE FACTURACION, Franquicia -> GRUPO: GRUPO FIBEX
+   */
+  group?: string;
+  /**
+   * button that appears to the right side of the control
+   */
+  buttonGroup?: 'add' | 'search';
+  /**
+   * button that appears to the left side of the control, usually used to specify units (like USD, BS, etc)
+   */
+  buttonLabel?: {
+    icon?: string;
+    content?: string;
+  }
 }
