@@ -12,6 +12,9 @@ export class DbfullClientService {
   // instancia custom de axios que tendra la configuracion por defecto para cada operacion que involucre el backend dbfull
   private readonly dbFullClient: AxiosInstance;
 
+  // no se para que se utiliza esto aqui en este servicio especificamente
+  private ShowInfoTable: any = "";
+
   constructor(
     private readonly configService: ConfigService,
     private readonly encryptionService: EncryptionService
@@ -23,6 +26,9 @@ export class DbfullClientService {
         'TokenAuthPlataform': this.configService.get('dbfull.authToken')
       }
     });
+
+    // No estoy seguro si este metodo actua como un tipo de cache para ShowInfoTable
+    this.ShowInfo();
   }
 
   /**
@@ -31,7 +37,7 @@ export class DbfullClientService {
    * @param dbName nombre de la base de datos a usar
    * @returns resultado del query (data)
    */
-  public async execute(query: string, dbName: string) {
+  public async execute(query: string, dbName: string): Promise<any> {
     this.configService.get('dbfull.url')
     let res = await this.dbFullClient.get(`${this.configService.get('dbfull.url')}/api`, {
       headers: {
@@ -96,8 +102,75 @@ export class DbfullClientService {
         data: body
       };
       axios.request(config)
+        .then((response: any) => resolve(response.data))
+        .catch((error: any) => reject(error));
+    })
+  }
+
+  async UpdateData(table: string, campoSearch: string, body: any) {
+    return new Promise(async (resolve, reject) => {
+      let config = {
+        method: 'put',
+        url: `${this.configService.get('dbfull.url')}/api/v1/update-info/${this.configService.get('dbfull.dbClubFibex')}/${table}/${campoSearch}`,
+        headers: {
+          'x-multiple-update': 'false',
+          'x-elements-obj': '[]',
+          'x-attr-duplicate': '[]',
+          'campo': '',
+          'Content-Type': 'application/json'
+        },
+        data: body
+      };
+      axios.request(config)
         .then((response) => resolve(response.data))
         .catch((error) => reject(error));
     })
   }
+
+  async ShowInfo() {
+    return new Promise(async (resolve, reject) => {
+      if (this.ShowInfoTable && this.ShowInfoTable != "") {
+        resolve(this.ShowInfoTable)
+      } else {
+        let config = {
+          method: 'get',
+          url: `${this.configService.get('dbfull.url')}/api/v1/show-all-info/${this.configService.get('dbfull.dbClubFibex')}`,
+        };
+        axios.request(config)
+          .then((response) => { resolve(response.data); this.ShowInfoTable = response.data })
+          .catch((error) => reject(error));
+      }
+    })
+  }
+
+  Filtrado(table: any) {
+    let info = this.ShowInfoTable.model.filter((datadb: any) => (datadb.tableName === table))
+    if (info && info.length > 0) {
+      info = info[0].attr.filter((camposexluido: any) => (camposexluido != "createdAt" && camposexluido != "updatedAt"));
+      return (info);
+    }
+    return [];
+  }
+
+  async CamposTableReturn(table: string) {
+    return new Promise(async (resolve, reject) => {
+      if (table && table != "") {
+        if (this.ShowInfoTable && this.ShowInfoTable != "") {
+          let info = this.Filtrado(table);
+          return info;
+        } else {
+          this.ShowInfo()
+            .then((resp: any) => {
+              this.ShowInfoTable = resp;
+              let info = this.Filtrado(table);
+              return info;
+            })
+            .catch((error: any) => { reject({ error: error }) })
+        }
+      } else {
+        reject({ error: "Error debes poner un nombre de tabla" })
+      }
+    })
+  }
+
 }
