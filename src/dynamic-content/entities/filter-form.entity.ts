@@ -5,7 +5,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
  * It refers to a category that holds search filters.
  */
 @Entity({ schema: 'dynamic_content' })
-export class FormFilter {
+export class FilterForm {
   @PrimaryGeneratedColumn({ type: "int" })
   id: number;
 
