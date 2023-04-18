@@ -21,7 +21,7 @@ import { FormControl } from './dynamic-content/entities/form-control.entity';
 import { FormGroup } from './dynamic-content/entities/form-group.entity';
 import { Form } from './dynamic-content/entities/form.entity';
 import { ActionButton } from './dynamic-content/entities/action-button.entity';
-import { FormFilter } from './dynamic-content/entities/form-filter.entity';
+import { FilterForm } from './dynamic-content/entities/filter-form.entity';
 import { DbfullClientService } from './services/dbfull-client/dbfull-client.service';
 import { EncryptionService } from './services/encryption/encryption.service';
 import dbfullDatabaseConfig from './config/dbfull-database.config';
@@ -68,7 +68,7 @@ import { Table } from './dynamic-content/entities/table.entity';
           Session,
           UserModule,
           ContentBlock,
-          FormFilter,
+          FilterForm,
           ActionButton,
           Table
         ],
