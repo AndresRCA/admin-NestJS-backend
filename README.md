@@ -1,6 +1,6 @@
 # AdminISPV1 Backend
 
-This a backend for the AdminISPV1 platform, built with NestJS.
+This a backend for the AdminISPV1 platform, built with NestJS (boostrapped using Fastify).
 
 ## Installation
 
