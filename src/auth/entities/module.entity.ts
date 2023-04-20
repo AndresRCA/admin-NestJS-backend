@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { IStyleRules } from 'src/forms/interfaces/IStyleRules.interface';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
-import { SubModule } from './sub-module.entity';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ContentBlock } from 'src/dynamic-content/entities/content-block.entity';
+import { IStyleRules } from 'src/dynamic-content/interfaces/IStyleRules.interface';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity({
   schema: 'auth',
@@ -19,7 +19,6 @@ export class Module {
   @IsNotEmpty()
   @IsString()
   @Column({
-    nullable: false,
     unique: true
   })
   name: string;
@@ -27,33 +26,50 @@ export class Module {
   @IsNotEmpty()
   @IsNumber()
   @Column({
-    nullable: false,
     type: 'int'
   })
   order: number;
 
-  @IsNotEmpty()
   @IsString()
   @Column({
     type: 'varchar',
     nullable: true,
-    comment: "route used in the frontend to access the module's view (if route isn't null, this module shouldn't possess any submodules)"
+    comment: "route used for building a router in the frontend. Value should be null if module has children and acts as a dropdown menu"
   })
-  route?: string | null;
+  route: string | null;
+
+  @IsString()
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    comment: "API route used in the frontend to access the module's view data. Value should be null if module has children and acts as a dropdown menu"
+  })
+  contentRoute: string | null;
   
   @Column({
-    nullable: true,
     type: 'json',
-    comment: 'JSON object with rules that define the styling characteristics of the module (like the icon that accompanies the name)'
+    nullable: true,
+    comment: 'JSON object with rules that define the styling characteristics of the module (like the icon that accompanies the name in the menu)'
   })
-  styleRules?: Pick<IStyleRules, 'icon'>;
+  styleRules: Pick<IStyleRules, 'icon'> | null;
 
+  @IsBoolean()
   @Column({
-    nullable: false,
     default: true
   })
   active: boolean
 
-  @OneToMany(() => SubModule, (subModule) => subModule.module, { eager: true }) // when fetching modules, always bring along the sub-modules
-  subModules: SubModule[]
+  /**
+   * Blocks of content that compose a module's view, they can be forms, buttons, tables, etc.
+   */
+  @OneToMany(() => ContentBlock, contentBlock => contentBlock.module)
+  contentBlocks: ContentBlock[];
+
+  /*----- SELF REFERENCING RELATIONSHIP -----*/
+  @ManyToOne(() => Module, module => module.childrenModules)
+  parentModule: Module | null;
+
+  @OneToMany(() => Module, module => module.parentModule, { eager: true })
+  childrenModules: Module[];
+  /*-----------------------------------------*/
 }

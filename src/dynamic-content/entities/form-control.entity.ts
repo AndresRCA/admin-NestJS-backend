@@ -6,7 +6,7 @@ import { IStyleRules } from '../interfaces/IStyleRules.interface';
 import { FormGroup } from './form-group.entity';
 
 @Entity({
-  schema: 'forms',
+  schema: 'dynamic_content',
   orderBy: { // returns form controls ordered by their column `order`
     order: "ASC"
   }
@@ -19,7 +19,7 @@ export class FormControl {
 
   @IsString()
   @Column({ nullable: true, type: 'text' })
-  description?: string | null;
+  description: string | null;
 
   @IsNotEmpty()
   @IsNumber()
@@ -32,6 +32,14 @@ export class FormControl {
   })
   control: IFormControl;
 
+  @IsString()
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    comment: "name of function to call in order to fetch the data used in this control"
+  })
+  dataSource: string | null;
+
   @Column({
     type: 'json',
     default: { "width": 12 },
@@ -39,7 +47,7 @@ export class FormControl {
   })
   styleRules: IStyleRules;
 
-  @ManyToOne(() => FormGroup, (formGroup) => formGroup.controls, {
+  @ManyToOne(() => FormGroup, (formGroup) => formGroup.formControls, {
     cascade: true, // using a single entity (FormGroup), allow operations to related tables like this one
     onDelete: "CASCADE" // when FormGroup is removed, delete all form controls
   })

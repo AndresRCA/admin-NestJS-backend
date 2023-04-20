@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
 import { FormGroup } from './form-group.entity';
 
-@Entity({ schema: 'forms' })
+@Entity({ schema: 'dynamic_content' })
 export class Form {
   @IsNotEmpty()
   @Type(() => Number) // for transforming the string value that comes from a request

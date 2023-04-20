@@ -1,13 +1,12 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm'
-import { IFormControl } from '../interfaces/IFormControl.interface';
 import { IStyleRules } from '../interfaces/IStyleRules.interface';
 import { FormControl } from './form-control.entity';
 import { Form } from './form.entity';
 
 @Entity({
-  schema: 'forms',
+  schema: 'dynamic_content',
   orderBy: { // returns form groups ordered by their column `order`
     order: "ASC"
   }
@@ -29,12 +28,6 @@ export class FormGroup {
     type: 'int'
   })
   order: number;
-
-  @Column({
-    type: 'json',
-    comment: 'Json array of controls for form group'
-  })
-  controls: IFormControl[];
 
   @Column({
     type: 'json',

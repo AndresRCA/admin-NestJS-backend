@@ -1,17 +1,17 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/auth/entities/user.entity';
 import { UserService } from 'src/auth/services/user.service';
 import { FindManyOptions, In, Not, Repository } from 'typeorm';
 import { FormQueryDto } from './dto/form-query.dto';
+import { ModuleQueryDto } from './dto/module-query.dto';
+import { ContentBlock } from './entities/content-block.entity';
 import { Form } from './entities/form.entity';
 
 @Injectable()
-export class FormsService {
-
+export class DynamicContentService {
   constructor(
+    @InjectRepository(ContentBlock) private contentBlockRepository: Repository<ContentBlock>,
     @InjectRepository(Form) private formsRepository: Repository<Form>,
-    @InjectRepository(User) private usersRepository: Repository<User>,
     private userService: UserService
   ) { }
 
@@ -43,7 +43,7 @@ export class FormsService {
     // if userId does not exist, the sessionToken must not have been valid or it was revoked by the backend
     if (!userId) throw new UnauthorizedException();
 
-    let controlIds = await this.getUserBlackListControlIds(userId);
+    let controlIds = await this.userService.getUserBlackListControlIds(userId);
     console.log('user controlIds', controlIds);
 
     let extraFields: any = {
@@ -59,7 +59,7 @@ export class FormsService {
 
   /**
    * Retrieves a single form that meets the criteria in fields, if sessionToken is specified the result will be adjusted to the user
-   * @param fields fields to search the form with (id, name, etc).
+   * @param fields fields to search the form with (id, name, etc)
    * @param sessionToken session id for a user
    * @returns forms, if sessionToken is present the returned form will be adjusted to user, if not present the returned form will unaltered
    */
@@ -85,7 +85,7 @@ export class FormsService {
     // if userId does not exist, the sessionToken must not have been valid or it was revoked by the backend
     if (!userId) throw new UnauthorizedException();
 
-    let controlIds = await this.getUserBlackListControlIds(userId);
+    let controlIds = await this.userService.getUserBlackListControlIds(userId);
     console.log('user controlIds', controlIds);
 
     let extraFields: any = {
@@ -100,21 +100,62 @@ export class FormsService {
   }
 
   /**
-   * Get list of ids of controls the user should not have access to.
-   * @param userId id to identify user
-   * @returns array of ids (FK) that belong to form controls
+   * Fetch a module's content, be it forms, action buttons, tables, or other kinds of views
+   * @param fields fields to search the form with (id, name, etc)
+   * @param sessionToken session id for a user
+   * @returns ContentBlock with content adjusted to user
    */
-  private async getUserBlackListControlIds(userId: number): Promise<Array<number>> {
-    const user = await this.usersRepository.findOne({ where: { id: userId }, relations: { controlsBlackList: true } });
-    if (!user) throw new InternalServerErrorException();
-    
-    let controlIds: Array<number> = [];
-    if (user!.controlsBlackList.length > 0) {
-      // get only an array of ids for the where clause
-      controlIds = user!.controlsBlackList.map((control) => control.id);
+  public async findModuleContent(moduleFields: ModuleQueryDto, userId: number): Promise<ContentBlock[]> {
+    /**
+     * find this user's list of elements they should have no access to (we use this to filter our query result of the module's content blocks
+     * if the content block posseses an element this user should not have, it gets removed by the where clause)
+     */
+    let controlIds = await this.userService.getUserBlackListControlIds(userId);
+    console.log('user controlIds', controlIds);
+    let buttonIds = await this.userService.getUserBlackListActionButtonsIds(userId)
+    console.log('user buttonIds', buttonIds);
+
+    let queryBuilder = this.contentBlockRepository.createQueryBuilder('contentBlock')
+      .leftJoinAndSelect('contentBlock.forms', 'forms')
+      .leftJoinAndSelect('forms.formGroups', 'formGroups')
+      .where('contentBlock.module_id = :moduleId', { moduleId: moduleFields.id })
+      .orderBy('contentBlock.order', 'ASC');
+
+    if (controlIds.length > 0) {
+      queryBuilder.leftJoinAndSelect('formGroups.formControls', 'formControls', 'formControls.id NOT IN (:...controlIds)', { controlIds });
+    } else {
+      queryBuilder.leftJoinAndSelect('formGroups.formControls', 'formControls');
     }
 
-    return controlIds;
+    if (buttonIds.length > 0) {
+      queryBuilder.leftJoinAndSelect('contentBlock.actionButtons', 'actionButtons', 'actionButtons.id NOT IN (:...buttonIds)', { buttonIds });
+    } else {
+      queryBuilder.leftJoinAndSelect('contentBlock.actionButtons', 'actionButtons');
+    }
+
+    return queryBuilder.getMany();
+    
+    /* this is not working as intended... */
+    return this.contentBlockRepository.find({
+      where: {
+        module: {
+          ...moduleFields,
+          contentBlocks: {
+            forms: {
+              formGroups: {
+                formControls: {
+                  id: Not(In(controlIds)) // this is not working
+                }
+              }
+            },
+            actionButtons: {
+              id: Not(In(buttonIds))
+            }
+          }
+        }
+      },
+      order: { order: 'ASC' }
+    });
   }
 
   /**

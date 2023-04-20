@@ -9,17 +9,23 @@ import databaseConfig from './config/database.config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
-import { FormsModule } from './forms/forms.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FormGroup } from './forms/entities/form-group.entity';
-import { Form } from './forms/entities/form.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { User } from './auth/entities/user.entity';
 import { Session } from './auth/entities/session.entity';
 import { Module as UserModule } from './auth/entities/module.entity';
-import { SubModule } from './auth/entities/sub-module.entity';
 import { Role } from './auth/entities/role.entity';
-import { FormControl } from './forms/entities/form-control.entity';
+import { DynamicContentModule } from './dynamic-content/dynamic-content.module';
+import { ContentBlock } from './dynamic-content/entities/content-block.entity';
+import { FormControl } from './dynamic-content/entities/form-control.entity';
+import { FormGroup } from './dynamic-content/entities/form-group.entity';
+import { Form } from './dynamic-content/entities/form.entity';
+import { ActionButton } from './dynamic-content/entities/action-button.entity';
+import { FilterForm } from './dynamic-content/entities/filter-form.entity';
+import { DbfullClientService } from './services/dbfull-client/dbfull-client.service';
+import { EncryptionService } from './services/encryption/encryption.service';
+import dbfullDatabaseConfig from './config/dbfull-database.config';
+import { Table } from './dynamic-content/entities/table.entity';
 
 @Module({
   imports: [
@@ -30,7 +36,8 @@ import { FormControl } from './forms/entities/form-control.entity';
       cache: true, // increase the performance of ConfigService#get method when it comes to variables stored in process.env
       load: [ // .config.ts files define properties based on process.env variables and converts strings to other types if needed, or adds default values
         httpConfig,
-        databaseConfig
+        databaseConfig,
+        dbfullDatabaseConfig
       ],
     }),
     // index.html serving
@@ -57,19 +64,21 @@ import { FormControl } from './forms/entities/form-control.entity';
           FormGroup,
           FormControl,
           User,
+          Role,
           Session,
           UserModule,
-          SubModule,
-          Role
+          ContentBlock,
+          FilterForm,
+          ActionButton,
+          Table
         ],
         synchronize: configService.get('NODE_ENV') !== 'production',
-        migrations: ['../migrations/*{.ts,.js}'],
         namingStrategy: new SnakeNamingStrategy()
       }),
       inject: [ConfigService],
     }),
     AuthModule,
-    FormsModule,
+    DynamicContentModule,
   ],
   controllers: [AppController],
   providers: [
@@ -77,7 +86,9 @@ import { FormControl } from './forms/entities/form-control.entity';
       provide: APP_GUARD,
       useClass: ThrottlerGuard, // by setting up this provider, ThrottlerGuard is now used globally
     },
-    AppService
+    AppService,
+    DbfullClientService,
+    EncryptionService
   ],
 })
 export class AppModule {}

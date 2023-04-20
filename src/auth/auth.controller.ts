@@ -2,12 +2,13 @@ import { Body, ConflictException, Controller, Get, Post, Put, Req, Res, UseGuard
 import { ConfigService } from '@nestjs/config';
 import { ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiSecurity, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { Cookies } from 'src/decorators/cookies.decorator';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { createUserDto } from './dto/create-user.dto';
 import { PublicUserDto } from './dto/public-user.dto';
+import { Module } from './entities/module.entity';
 import { Session } from './entities/session.entity';
 import { User } from './entities/user.entity';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
@@ -25,7 +26,8 @@ export class AuthController {
     private authService: AuthService,
     private userService: UserService,
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(Session) private sessionsRepository: Repository<Session>
+    @InjectRepository(Session) private sessionsRepository: Repository<Session>,
+    @InjectRepository(Module) private modulesRepository: Repository<Module>
   ) { }
   
   /**
@@ -60,8 +62,11 @@ export class AuthController {
   @Post('login')
   @ApiCreatedResponse({ description: 'User logged in without any issues and User object was returned', type: PublicUserDto })
   @ApiUnauthorizedResponse({ description: 'Login attempt failed' })
-  async login(@Req() req: any, @Res({ passthrough: true }) res: FastifyReply): Promise<PublicUserDto> {
-    const user = req['user']! as Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session' | 'roles'>; // user comes from LocalAuthGuard strategy
+  async login(
+    @Req() req: FastifyRequest & { user: Pick<User, 'id' | 'username' | 'email' | 'modules' | 'session' | 'roles'> },
+    @Res({ passthrough: true }) res: FastifyReply
+  ): Promise<PublicUserDto> {
+    const user = req.user // user comes from LocalAuthGuard strategy
     // if it's user first login, create a session row for them
     if (!user.session) {
       console.log('new session created');
@@ -87,7 +92,14 @@ export class AuthController {
   @Put('logout')
   @ApiCreatedResponse({ description: 'User succesfully logged out and their means of authentication was stripped away' })
   @ApiUnauthorizedResponse({ description: 'Non-current user tried to log out' })
-  async logout(@Res({ passthrough: true }) res: FastifyReply, @Cookies() cookies: any) {
+  async logout(
+    @Req() req: FastifyRequest & { userId: number },
+    @Res({ passthrough: true }) res: FastifyReply,
+    @Cookies() cookies: any
+  ) {
+    const userId = req.userId;
+    // await this.authService.logoutUser(userId); // use this function instead to logout the user? or not...
+
     const currentSessionToken: string = cookies[this.configService.get('SESSION_ID_NAME') as string];
     console.log('log out sessionToken:', currentSessionToken);
     await this.sessionsRepository.update({ sessionToken: currentSessionToken }, { sessionToken: null })
@@ -109,23 +121,28 @@ export class AuthController {
   @Get('user-session')
   @ApiOkResponse({ description: 'User had a valid session token', type: PublicUserDto })
   @ApiUnauthorizedResponse({ description: "Session token wasn't valid" })
-  async userSession(@Req() req: any): Promise<PublicUserDto | null> {
-    const userId = req['userId']! as number;
+  async userSession(@Req() req: FastifyRequest & { userId: number }): Promise<PublicUserDto | null> {
+    const userId = req.userId;
     const user = this.userService.getPublicUserInfo({ id: userId });
     return user;
   }
 
-  // work in progress SessionAuthGuard should probably not pass the user object but just check the cookie value
   /**
    * Check if session id is valid
    * @param req 
    * @returns User data for current session
    */
-   //@UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request (SessionAuthGuard does all the work)
+   @UseGuards(SessionAuthGuard) // check for session id cookie and pass user to request (SessionAuthGuard does all the work)
    @Get('session/check-session')
    @ApiOkResponse({ description: 'User session is active' })
    @ApiUnauthorizedResponse({ description: "Session is not active or not present" })
    checkSession(): string {
     return 'session is active'
+   }
+
+   @Get('test')
+   async test() {
+    let r = await this.modulesRepository.find();
+    console.log(r)
    }
 }
