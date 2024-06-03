@@ -1,6 +1,6 @@
-# AdminISPV1 Backend
+# AdminISP Backend
 
-This a backend for the AdminISPV1 platform, built with NestJS (boostrapped using Fastify).
+This a backend for the AdminISP platform, built with NestJS (boostrapped using Fastify).
 
 ## Installation
 
@@ -14,7 +14,7 @@ This project was built with `Node v16.18.0 LTS`, so keep that in mind as you hos
 
 ## Security
 
-This backend posses all sort of security measures against dangers such as DoS (Denial of Service), DDoS (Distributed Denial of Service), XSS (Cross Site Scripting), open endpoints, lack of authentication, and other such cases. The following is a list of enabled tools (libraries and security aspects):
+This backend possesses all sort of security measures against dangers such as DoS (Denial of Service), DDoS (Distributed Denial of Service), XSS (Cross Site Scripting), open endpoints, lack of authentication, and other such cases. The following is a list of enabled tools (libraries and security aspects):
 
 * helmet ✅
 * CORS ✅
@@ -86,8 +86,8 @@ If you'd like to collaborate on this project, there are some **policies** that I
 
     This is how the documented API and request would look like:
 
-    ![AdminISPV1 api docs 1](./docs/apiDocs1.png)
-    ![AdminISPV1 api docs 2](./docs/apiDocs2.png)
+    ![AdminISP api docs 1](./docs/apiDocs1.png)
+    ![AdminISP api docs 2](./docs/apiDocs2.png)
 
     > Requests that require an API key are protected, you can authorize all requests when clicking the lock on the top right corner of `/docs` and then entering your key value.
 
